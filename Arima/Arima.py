@@ -5,6 +5,7 @@ from statsmodels.tsa.arima_model import ARIMA
 from matplotlib import pyplot
 from sklearn.metrics import mean_squared_error
 
+
 # check how it works when it wants to predict.
 
 def parser(x):
@@ -18,8 +19,18 @@ size = int(len(X) * 0.80)
 train, test = X[0:size], X[size:len(X)]
 history = [x for x in train]
 predictions = list()
+
+# p is the number of autoregressive terms,
+# d is the number of nonseasonal differences needed for stationarity, and
+# q is the number of lagged forecast errors in the prediction equation.
+
+p = 1
+d = 1
+q = 0
+print('P: %.2f, D: %.2f, Q: %.2f' % (p, d, q))
+
 for t in range(len(test)):
-    model = ARIMA(history, order=(5, 1, 0))
+    model = ARIMA(history, order=(p, d, q))
     model_fit = model.fit(disp=0)
     output = model_fit.forecast()
     yhat = output[0]
@@ -30,6 +41,10 @@ for t in range(len(test)):
 error = mean_squared_error(test, predictions)
 print('Test MSE: %.3f' % error)
 # plot
-pyplot.plot(test)
-pyplot.plot(predictions, color='red')
+pyplot.plot(test, label='Real Value')
+pyplot.plot(predictions, label='Predicted Value', color='red')
+pyplot.legend()
+pyplot.title('Arima - Avg Bitcoin Prices')
+pyplot.xlabel('Days')
+pyplot.ylabel('USD')
 pyplot.show()

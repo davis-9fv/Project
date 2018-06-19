@@ -1,12 +1,13 @@
-# http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html#sklearn.linear_model.ElasticNet
-from sklearn.linear_model import ElasticNet
+from sklearn.neighbors import KNeighborsRegressor
 from pandas import DataFrame
 from pandas import Series
 from pandas import concat
 from pandas import read_csv
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
+
 from math import sqrt
+from matplotlib import pyplot
 import numpy
 from Util import misc
 
@@ -60,8 +61,6 @@ def invert_scale(scaler, X, value):
 
 
 series = read_csv('../Thesis/Bitcoin_historical_data_processed_supervised.csv', header=0, sep='\t')
-# Si se pone shuffle true, se mejora la respuesta
-# X_train, X_test, y_train, y_test = train_test_split(raw_data[:, 3], raw_data[:, 4], test_size=0.20, shuffle=False)
 
 # transform data to be stationary
 raw_values = series['Avg'].values
@@ -80,42 +79,33 @@ scaler, train_scaled, test_scaled = scale(train, test)
 X_train, y_train = train_scaled[:, 0:-1], train_scaled[:, -1]
 X_test, y_test = test_scaled[:, 0:-1], test_scaled[:, -1]
 
-print(X_train.shape)
-X_train = X_train.reshape((X_train.shape[0], 1))
-print(X_train.shape)
-print(X_test.shape)
-X_test = X_test.reshape(X_test.shape[0], 1)
-print(X_test.shape)
-
-regr = ElasticNet(random_state=0)
-regr.fit(X_train, y_train)
-
-print(regr.coef_)
-print(regr.intercept_)
-
-y_predicted = regr.predict(X_test)
-
-print('y_test: ')
-print(y_test)
-print('y_predicted: ')
-print(y_predicted)
+n_neighbors = 10
+neigh = KNeighborsRegressor(algorithm='kd_tree', leaf_size=30, weights='uniform', n_neighbors=n_neighbors, n_jobs=4)
+neigh.fit(X_train, y_train)
 
 predictions = list()
 
-for i in range(len(test_scaled)):
+y_predicted = neigh.predict(X_test)
+
+# raw_values[-365:]
+
+for i in range(len(y_predicted)):
     X, y = test_scaled[i, 0:-1], test_scaled[i, -1]
     yhat = y_predicted[i]
-    print("Y_test: " + str(y) + " Yhat: " + str(yhat))
+    print("Scaled: Y_test: " + str(y) + " Yhat: " + str(yhat))
 
     yhat = invert_scale(scaler, X, yhat)
     print("yhat no scaled:" + str(yhat))
+
     yhat = inverse_difference(raw_values, yhat, len(test_scaled) + 1 - i)
     print("yhat no difference:" + str(yhat))
-    # store forecast
     predictions.append(yhat)
 
 rmse = sqrt(mean_squared_error(raw_values[-365:], predictions))
 print('Test RMSE: %.7f' % (rmse))
 
+y = raw_values[-365:]
 
-misc.plot_line_graph('ElasticNet', raw_values[-365:], predictions)
+misc.print_comparison_list('RawData', y, predictions)
+misc.plot_line_graph('KNN(' + str(n_neighbors) + ')', raw_values[-365:], predictions)
+misc.plot_line_graph('KNN(' + str(n_neighbors) + ')', raw_values[-365:], predictions)
