@@ -1,4 +1,8 @@
 from matplotlib import pyplot
+from bokeh.layouts import gridplot
+from bokeh.plotting import figure, show, output_file
+
+import pandas as pd
 
 
 def print_comparison(title, expected, prediction):
@@ -18,3 +22,39 @@ def plot_line_graph(algorithm_name="Unkown", expected=[], predictions=[]):
     pyplot.xlabel('Days')
     pyplot.ylabel('USD')
     pyplot.show()
+
+
+def plot_data_graph(algorithm_name="Unkown", data=[]):
+    pyplot.plot(data, label='Real Value')
+    pyplot.legend()
+    pyplot.title(algorithm_name + ' - Avg Bitcoin Prices')
+    pyplot.xlabel('Days')
+    pyplot.ylabel('USD')
+    pyplot.show()
+
+
+def plot_line_graph2(algorithm_name="Unkown", date=[], expected=[], predictions=[]):
+    p1 = figure(x_axis_type="datetime", title=algorithm_name + ' - Avg Bitcoin Prices')
+    p1.grid.grid_line_alpha = 0.8
+    p1.xaxis.axis_label = 'Date'
+    p1.yaxis.axis_label = 'USD'
+
+    p1.line(pd.to_datetime(date), predictions, color='blue', legend='Predicted Value', line_dash="2 2")
+    p1.line(pd.to_datetime(date), expected, color='red', legend='Expected Value', line_dash="4 4")
+    p1.legend.location = "top_left"
+
+    output_file("AvgBitcoinPrices.html", title="Avg Bitcoin Prices")
+    show(gridplot([[p1]], plot_width=950, plot_height=400))  # open a browser
+
+
+def plot_data_graph2(algorithm_name="Unkown", date=[], data=[]):
+    p1 = figure(x_axis_type="datetime", title=algorithm_name + ' - Avg Bitcoin Prices')
+    p1.grid.grid_line_alpha = 0.8
+    p1.xaxis.axis_label = 'Date'
+    p1.yaxis.axis_label = 'USD'
+
+    p1.line(pd.to_datetime(date), data, color='black', legend='Real Value')
+    p1.legend.location = "top_left"
+
+    output_file("RealValue.html", title="Real Value - Avg Bitcoin Prices")
+    show(gridplot([[p1]], plot_width=950, plot_height=400))  # open a browser

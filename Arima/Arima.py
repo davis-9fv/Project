@@ -4,13 +4,7 @@ from pandas import DataFrame
 from statsmodels.tsa.arima_model import ARIMA
 from matplotlib import pyplot
 from sklearn.metrics import mean_squared_error
-
-
-# check how it works when it wants to predict.
-
-def parser(x):
-    return datetime.strptime('190' + x, '%Y-%m')
-
+from Util import data_misc
 
 series = read_csv('../Thesis/Bitcoin_historical_data_processed.csv', header=0, sep='\t')
 X = series["Avg"]
