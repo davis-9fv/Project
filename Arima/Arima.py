@@ -1,13 +1,13 @@
 from pandas import read_csv
-from pandas import datetime
-from pandas import DataFrame
 from statsmodels.tsa.arima_model import ARIMA
 from matplotlib import pyplot
 from sklearn.metrics import mean_squared_error
-from Util import data_misc
+from Util import misc
 
-series = read_csv('../Thesis/Bitcoin_historical_data_processed.csv', header=0, sep='\t')
+series = read_csv('../Thesis/Bitcoin_historical_data_processed_1f.csv', header=0, sep='\t')
 X = series["Avg"]
+date = series['Date'].values
+
 X = X.values
 size = int(len(X) * 0.80)
 train, test = X[0:size], X[size:len(X)]
@@ -35,10 +35,5 @@ for t in range(len(test)):
 error = mean_squared_error(test, predictions)
 print('Test MSE: %.3f' % error)
 # plot
-pyplot.plot(test, label='Real Value')
-pyplot.plot(predictions, label='Predicted Value', color='red')
-pyplot.legend()
-pyplot.title('Arima - Avg Bitcoin Prices')
-pyplot.xlabel('Days')
-pyplot.ylabel('USD')
-pyplot.show()
+misc.plot_line_graph2('Arima', date[-365:], X[-365:], predictions)
+misc.plot_data_graph2('Data', date, X)

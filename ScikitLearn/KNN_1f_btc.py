@@ -5,11 +5,12 @@ from math import sqrt
 from Util import misc
 from Util import data_misc
 
-
-series = read_csv('../Thesis/Bitcoin_historical_data_processed_supervised.csv', header=0, sep='\t')
+series = read_csv('../Thesis/Bitcoin_historical_data_processed_1f.csv', header=0, sep='\t')
 
 # transform data to be stationary
 raw_values = series['Avg'].values
+date = series['Date'].values
+
 diff_values = data_misc.difference(raw_values, 1)
 
 # transform data to be supervised learning
@@ -28,11 +29,13 @@ X_test, y_test = test_scaled[:, 0:-1], test_scaled[:, -1]
 n_neighbors = 5
 neigh = KNeighborsRegressor(algorithm='kd_tree', leaf_size=30, weights='uniform', n_neighbors=n_neighbors, n_jobs=4)
 neigh.fit(X_train, y_train)
+score = neigh.score(X_train, y_train)
+print('Score: %f' % (score))
 
 predictions = list()
 
 y_predicted = neigh.predict(X_test)
-print(neigh.score(X_test,y_test))
+print(neigh.score(X_test, y_test))
 
 # raw_values[-365:]
 
@@ -53,6 +56,6 @@ print('Test RMSE: %.7f' % (rmse))
 
 y = raw_values[-365:]
 
-#misc.print_comparison_list('RawData', y, predictions)
-misc.plot_line_graph('KNN(' + str(n_neighbors) + ')', raw_values[-365:], predictions)
-misc.plot_line_graph('KNN(' + str(n_neighbors) + ')', raw_values[-365:], predictions)
+# plot
+misc.plot_line_graph2('KNN(' + str(n_neighbors) + ')', date[-365:], raw_values[-365:], predictions)
+misc.plot_data_graph2('Data', date, raw_values)

@@ -43,7 +43,7 @@ def plot_line_graph2(algorithm_name="Unkown", date=[], expected=[], predictions=
     p1.line(pd.to_datetime(date), expected, color='red', legend='Expected Value', line_dash="4 4")
     p1.legend.location = "top_left"
 
-    output_file("AvgBitcoinPrices.html", title="Avg Bitcoin Prices")
+    output_file('../tmp/' + algorithm_name + '.html', title="Avg Bitcoin Prices")
     show(gridplot([[p1]], plot_width=950, plot_height=400))  # open a browser
 
 
@@ -56,5 +56,5 @@ def plot_data_graph2(algorithm_name="Unkown", date=[], data=[]):
     p1.line(pd.to_datetime(date), data, color='black', legend='Real Value')
     p1.legend.location = "top_left"
 
-    output_file("RealValue.html", title="Real Value - Avg Bitcoin Prices")
+    output_file("../tmp/RealValue.html", title="Real Value - Avg Bitcoin Prices")
     show(gridplot([[p1]], plot_width=950, plot_height=400))  # open a browser

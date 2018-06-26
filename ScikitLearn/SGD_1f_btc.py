@@ -14,12 +14,13 @@ from Util import misc
 from Util import data_misc
 
 # load dataset
-series = read_csv('../Thesis/Bitcoin_historical_data_processed_supervised.csv', header=0, sep='\t')
+series = read_csv('../Thesis/Bitcoin_historical_data_processed_1f.csv', header=0, sep='\t')
 
 # numpy.random.seed(seed=9)
 
 # transform data to be stationary
 raw_values = series['Avg'].values
+date = series['Date'].values
 diff_values = data_misc.difference(raw_values, 1)
 
 # transform data to be supervised learning
@@ -62,7 +63,11 @@ print('Test RMSE: %.7f' % (rmse))
 y = raw_values[-365:]
 
 misc.print_comparison_list('Raw', raw_values[-365:], predictions)
-misc.plot_line_graph('SGD', raw_values[-365:], predictions)
+
+# plot
+misc.plot_line_graph2('SGD', date[-365:], raw_values[-365:], predictions)
+misc.plot_data_graph2('Data', date, raw_values)
+
 
 
 

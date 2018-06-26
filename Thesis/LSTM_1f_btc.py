@@ -7,9 +7,9 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.layers import LSTM
 from math import sqrt
-from matplotlib import pyplot
-from Util import data_misc
 import numpy
+from Util import misc
+from Util import data_misc
 
 
 # fit an LSTM network to training data
@@ -38,12 +38,13 @@ def forecast_lstm(model, batch_size, X):
 
 
 # load dataset
-series = read_csv('../Thesis/Bitcoin_historical_data_processed_supervised.csv', header=0, sep='\t')
+series = read_csv('../Thesis/Bitcoin_historical_data_processed_1f.csv', header=0, sep='\t')
 
 numpy.random.seed(seed=9)
 
 # transform data to be stationary
 raw_values = series['Avg'].values
+date = series['Date'].values
 diff_values = data_misc.difference(raw_values, 1)
 
 # transform data to be supervised learning
@@ -77,8 +78,8 @@ for r in range(repeats):
         y = data_misc.invert_scale(scaler, X, y)
 
         # invert differencing
-        yhat = data_misc.inverse_difference(raw_values, yhat, len(test_scaled) +0 - i)
-        y = data_misc.inverse_difference(raw_values, y, len(test_scaled) +0  - i)
+        yhat = data_misc.inverse_difference(raw_values, yhat, len(test_scaled) + 0 - i)
+        y = data_misc.inverse_difference(raw_values, y, len(test_scaled) + 0 - i)
 
         # print(" Y_test: " + str(y) + " Yhat: " + str(yhat) + " yraw:" + str(raw_values[i + len(train) + 1]))
         # store forecast
@@ -91,17 +92,13 @@ for r in range(repeats):
     # print(predictions)
     error_scores.append(rmse)
 
-    pyplot.plot(raw_values[-365:], label='Real Value')
-    pyplot.plot(predictions, label='Predicted Value', color='red')
-    pyplot.legend()
-    pyplot.title('Avg Bitcoin Prices')
-    pyplot.xlabel('Days')
-    pyplot.ylabel('USD')
-    pyplot.show()
+    # plot
+    misc.plot_line_graph2('LSTM_rmse_' + str(rmse), date[-365:], raw_values[-365:], predictions)
 
 # summarize results
 results = DataFrame()
 results['rmse'] = error_scores
 print(results.describe())
-results.boxplot()
-#pyplot.show()
+misc.plot_data_graph2('Data', date, raw_values)
+# results.boxplot()
+# pyplot.show()

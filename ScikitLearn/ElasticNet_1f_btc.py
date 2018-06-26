@@ -56,7 +56,7 @@ for i in range(len(test_scaled)):
     yhat = data_misc.invert_scale(scaler, X, yhat)
     # print("yhat no scaled:" + str(yhat))
 
-    yhat = data_misc.inverse_difference(raw_values, yhat, len(test_scaled) + 0 - i)
+    yhat = data_misc.inverse_difference(raw_values, yhat, len(test_scaled) + 1 - i)
     # print("yhat no difference:" + str(yhat))
     # store forecast
     predictions.append(yhat)
