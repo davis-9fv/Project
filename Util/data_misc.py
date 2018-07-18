@@ -65,7 +65,7 @@ def from_scaled_diff_raw(scaler, ):
 
 
 def timeseries_to_moving_average(data, window=3):
-    window = 3
+    # window = 3
     history = [data[i] for i in range(window)]
     test = [data[i] for i in range(window, len(data))]
     predictions = list()
@@ -78,3 +78,81 @@ def timeseries_to_moving_average(data, window=3):
         history.append(obs)
 
     return predictions
+
+
+def get_train_length(dataset, batch_size, test_percent):
+    # substract test_percent to be excluded from training, reserved for testset
+    length = len(dataset)
+    length *= 1 - test_percent
+    train_length_values = []
+    for x in range(int(length) - 100, int(length)):
+        modulo = x % batch_size
+        if (modulo == 0):
+            train_length_values.append(x)
+            print(x)
+    return (max(train_length_values))
+
+
+def get_test_length(dataset, batch_size,upper_train,timesteps):
+    test_length_values = []
+    for x in range(len(dataset) - 200, len(dataset) - timesteps * 2):
+        modulo = (x - upper_train) % batch_size
+        if (modulo == 0):
+            test_length_values.append(x)
+            print(x)
+    return (max(test_length_values))
+
+# Creating a data structure with n timesteps
+def data_to_timesteps(train, length, timesteps):
+    X_train = []
+    y_train = []
+    print(length + timesteps)
+    for i in range(timesteps, length + timesteps):
+        X_train.append(train[i - timesteps:i])
+        y_train.append(train[i:i + timesteps])
+
+    print(len(X_train))
+    print(len(y_train))
+    print(numpy.array(X_train).shape)
+    print(numpy.array(y_train).shape)
+
+    X_train, y_train = numpy.array(X_train), numpy.array(y_train)
+    X_train = numpy.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+    y_train = numpy.reshape(y_train, (y_train.shape[0], y_train.shape[1], 1))
+
+    return X_train, y_train
+
+
+# Creating a data structure with n timesteps
+def data_to_timesteps(train, length, timesteps):
+    X_train = []
+    y_train = []
+    print(length + timesteps)
+    for i in range(timesteps, length + timesteps):
+        X_train.append(train[i - timesteps:i])
+        y_train.append(train[i:i + timesteps])
+
+    print(len(X_train))
+    print(len(y_train))
+    print(numpy.array(X_train).shape)
+    print(numpy.array(y_train).shape)
+
+    X_train, y_train = numpy.array(X_train), numpy.array(y_train)
+    X_train = numpy.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+    y_train = numpy.reshape(y_train, (y_train.shape[0], y_train.shape[1], 1))
+
+    return X_train, y_train
+
+
+# Creating a data structure with n timesteps
+def test_data_to_timesteps(test, testset_length, timesteps):
+    X_test = []
+    y_test = []
+    for i in range(timesteps, testset_length + timesteps):
+        X_test.append(test[i - timesteps:i])
+        y_test.append(test[i:i + timesteps])
+    X_test = numpy.array(X_test)
+    y_test = numpy.array(y_test)
+    X_test = numpy.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
+    y_test = numpy.reshape(y_test, (y_test.shape[0], y_test.shape[1], 1))
+    return X_test, y_test

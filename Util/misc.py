@@ -48,13 +48,32 @@ def plot_line_graph2(algorithm_name="Unkown", date=[], expected=[], predictions=
 
 
 def plot_data_graph2(algorithm_name="Unkown", date=[], data=[]):
-    p1 = figure(x_axis_type="datetime", title=algorithm_name + ' - Avg Bitcoin Prices')
+    p1 = figure(x_axis_type="datetime", title=algorithm_name + ' - Total of Passangers')
     p1.grid.grid_line_alpha = 0.8
     p1.xaxis.axis_label = 'Date'
-    p1.yaxis.axis_label = 'USD'
+    p1.yaxis.axis_label = 'Quantity'
 
     p1.line(pd.to_datetime(date), data, color='black', legend='Real Value')
     p1.legend.location = "top_left"
 
-    output_file("../tmp/RealValue.html", title="Real Value - Avg Bitcoin Prices")
+    output_file("../tmp/RealValue.html", title="Real Value - Total of Passangers")
+    show(gridplot([[p1]], plot_width=950, plot_height=400))  # open a browser
+
+
+def plot_lines_graph(title="Unkown", date=[], titles=[], data=[]):
+    p1 = figure(x_axis_type="datetime", title=title + ' - Total of Passangers')
+    p1.grid.grid_line_alpha = 0.8
+    p1.xaxis.axis_label = 'Date'
+    p1.yaxis.axis_label = 'Quantity'
+    colors = ['red', 'blue', 'black', 'yellow', 'green', 'gray', 'pink','orange']
+    line_dash = ['4 3','5 4', '6 5', '7 6', '8 7', '9 8', '10 9']
+
+    # p1.line(pd.to_datetime(date), [0,1000], line_width=2)
+
+    for i in range(len(titles)):
+        p1.line(pd.to_datetime(date), data[i], color=colors[i], legend=titles[i], line_dash=line_dash[i], line_width=1)
+
+    p1.legend.location = "top_left"
+
+    output_file('../tmp/' + title + '.html', title=title)
     show(gridplot([[p1]], plot_width=950, plot_height=400))  # open a browser

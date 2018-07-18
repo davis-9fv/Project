@@ -38,13 +38,19 @@ def forecast_lstm(model, batch_size, X):
 
 
 # load dataset
-series = read_csv('../Thesis/Bitcoin_historical_data_processed_1f.csv', header=0, sep='\t')
+series = read_csv('../data/airline-passengers.csv', header=0, sep='\t')
 
 numpy.random.seed(seed=9)
 
-# transform data to be stationary
-raw_values = series['Avg'].values
 date = series['Date'].values
+date = numpy.delete(date, (-1), axis=0)
+
+raw_values = series['Passangers'].values
+size_raw_values = len(raw_values)
+split = int(size_raw_values * 0.80)  # 0.80
+print('raw_values:' + str(len(raw_values)))
+
+
 diff_values = data_misc.difference(raw_values, 1)
 
 # transform data to be supervised learning
@@ -52,7 +58,7 @@ supervised = data_misc.timeseries_to_supervised(diff_values, 1)
 supervised_values = supervised.values
 
 # split data into train and test-sets
-train, test = supervised_values[0:-365], supervised_values[-365:]
+train, test = supervised_values[0:-split], supervised_values[-split:]
 
 # transform the scale of the data
 scaler, train_scaled, test_scaled = data_misc.scale(train, test)
@@ -62,10 +68,10 @@ repeats = 20
 error_scores = list()
 for r in range(repeats):
     # fit the model
-    lstm_model = fit_lstm(train_scaled, 10, nb_epoch=3, neurons=1)
+    lstm_model = fit_lstm(train_scaled, batch_size=1, nb_epoch=3, neurons=1)
     # forecast the entire training dataset to build up state for forecasting
-    train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
-    lstm_model.predict(train_reshaped, batch_size=1)
+    #train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
+    #lstm_model.predict(train_reshaped, batch_size=1)
     # walk-forward validation on the test data
     predictions = list()
     for i in range(len(test_scaled)):
@@ -78,8 +84,8 @@ for r in range(repeats):
         y = data_misc.invert_scale(scaler, X, y)
 
         # invert differencing
-        yhat = data_misc.inverse_difference(raw_values, yhat, len(test_scaled) + 0 - i)
-        y = data_misc.inverse_difference(raw_values, y, len(test_scaled) + 0 - i)
+        yhat = data_misc.inverse_difference(raw_values, yhat, len(test_scaled) + 1 - i)
+        y = data_misc.inverse_difference(raw_values, y, len(test_scaled) + 1 - i)
 
         # print(" Y_test: " + str(y) + " Yhat: " + str(yhat) + " yraw:" + str(raw_values[i + len(train) + 1]))
         # store forecast
@@ -87,13 +93,13 @@ for r in range(repeats):
 
     # report performance
 
-    rmse = sqrt(mean_squared_error(raw_values[-365:], predictions))
+    rmse = sqrt(mean_squared_error(raw_values[-split:], predictions))
     print('%d) Test RMSE: %.3f' % (r + 1, rmse))
     # print(predictions)
     error_scores.append(rmse)
 
     # plot
-    misc.plot_line_graph2('LSTM_rmse_' + str(rmse), date[-365:], raw_values[-365:], predictions)
+    misc.plot_line_graph2('LSTM_rmse_' + str(rmse), date[-split:], raw_values[-split:], predictions)
 
 # summarize results
 results = DataFrame()
