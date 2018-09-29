@@ -129,7 +129,7 @@ for i in range(0, 1):
 
     df2.to_csv('my_csv.csv', mode='a', header=False)
 
-    current_block_hash = previous_block
+    current_block_hash = next_block
 
 print(df)
 
