@@ -3,9 +3,11 @@ from urllib.request import urlopen
 import pandas as pd
 from datetime import datetime
 
-# genesis_block = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
-genesis_block = "0000000000000000001ecdeebdc3d86b707750aa3c040551fc75a73b7f983d48"
-current_block_hash = ""
+# We end with this block
+genesis_block = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
+end_block = "0000000000000000000000000000000000000000000000000000000000000000"
+# We start from this block
+current_block_hash = "000000007bc154e0fa7ea32218a72fe2c1bb9f86cf8c9ebf9a715ed27fdb229a"
 use_genesis = True
 
 # columns = ['Hash', 'Previous Block', 'Next Block(s)']
@@ -14,13 +16,13 @@ columns = ['Hash', 'Previous Block', 'Next Block(s)', 'Number Of Transactions', 
            'Bits', 'Size', 'Weight', 'Version', 'Nonce', 'Block Reward']
 
 df = pd.DataFrame(columns=columns)
+df.to_csv('my_csv.csv', mode='a', header=True)
 print(str(datetime.now()))
 
-for i in range(0, 1):
-    if use_genesis:
-        current_block_hash = genesis_block
-        use_genesis = False
+for i in range(0, 1000):
 
+    if current_block_hash == end_block:
+        break
     url = "https://www.blockchain.com/btc/block/" + current_block_hash
     usock = urlopen(url)
     data = usock.read()
@@ -125,11 +127,9 @@ for i in range(0, 1):
             transaction_fees, height, timestamp, relayed_by, difficulty, bits, size, weight, version, nonce,
             block_reward]]
     df2 = pd.DataFrame(row, columns=columns)
-    df = df.append(df2)
-
     df2.to_csv('my_csv.csv', mode='a', header=False)
 
-    current_block_hash = next_block
+    current_block_hash = previous_block
 
 print(df)
 
