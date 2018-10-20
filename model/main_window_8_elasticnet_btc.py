@@ -20,7 +20,7 @@ print(time_start.strftime('%Y-%m-%d %H:%M:%S'))
 result = list()
 execute_train = False
 
-iterations = 2
+iterations = 200
 x_iteration = [x for x in range(0, iterations)]
 y_rmse = [0 for x in range(0, iterations)]
 
