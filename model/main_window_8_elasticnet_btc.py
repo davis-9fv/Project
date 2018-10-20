@@ -8,19 +8,19 @@ from sklearn.utils import shuffle
 import numpy as np
 import datetime
 
+
 def compare(y_test, y_predicted):
     rmse = sqrt(mean_squared_error(y_test, y_predicted))
     return rmse
 
 
-
-now = datetime.datetime.now()
-print(now.strftime('%Y-%m-%d %H:%M:%S'))
+time_start = datetime.datetime.now()
+print(time_start.strftime('%Y-%m-%d %H:%M:%S'))
 
 result = list()
 execute_train = False
 
-iterations = 200
+iterations = 2
 x_iteration = [x for x in range(0, iterations)]
 y_rmse = [0 for x in range(0, iterations)]
 
@@ -86,6 +86,6 @@ for i in range(0, iterations):
 misc.plot_one_line('Shuflle of the data', x_iteration, y_rmse, 'Iteration', 'RMSE')
 print(sum(y_rmse) / float(len(y_rmse)))
 
-
-now = datetime.datetime.now()
-print(now.strftime('%Y-%m-%d %H:%M:%S'))
+time_end = datetime.datetime.now()
+print(time_end.strftime('%Y-%m-%d %H:%M:%S'))
+print('Duration of the script: %s' % (str(time_end - time_start)))
