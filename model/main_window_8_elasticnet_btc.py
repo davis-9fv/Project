@@ -1,4 +1,3 @@
-from Util import algorithm
 from pandas import read_csv
 from sklearn.metrics import mean_squared_error
 from math import sqrt
@@ -7,12 +6,16 @@ from Util import data_misc
 from sklearn.linear_model import ElasticNet
 from sklearn.utils import shuffle
 import numpy as np
-
+import datetime
 
 def compare(y_test, y_predicted):
     rmse = sqrt(mean_squared_error(y_test, y_predicted))
     return rmse
 
+
+
+now = datetime.datetime.now()
+print(now.strftime('%Y-%m-%d %H:%M:%S'))
 
 result = list()
 execute_train = False
@@ -82,3 +85,7 @@ for i in range(0, iterations):
 
 misc.plot_one_line('Shuflle of the data', x_iteration, y_rmse, 'Iteration', 'RMSE')
 print(sum(y_rmse) / float(len(y_rmse)))
+
+
+now = datetime.datetime.now()
+print(now.strftime('%Y-%m-%d %H:%M:%S'))
