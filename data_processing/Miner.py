@@ -6,9 +6,8 @@ from datetime import datetime
 # We end with this block
 genesis_block = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
 end_block = "0000000000000000000000000000000000000000000000000000000000000000"
-# We start from this block
-current_block_hash = "000000007bc154e0fa7ea32218a72fe2c1bb9f86cf8c9ebf9a715ed27fdb229a"
-use_genesis = True
+# We start from this Block #543652
+current_block_hash = "0000000000000000001cad109639af2809371ffc1c8ca46415bdeea9856522ef"
 
 # columns = ['Hash', 'Previous Block', 'Next Block(s)']
 columns = ['Hash', 'Previous Block', 'Next Block(s)', 'Number Of Transactions', 'Output Total',
@@ -19,8 +18,8 @@ df = pd.DataFrame(columns=columns)
 df.to_csv('my_csv.csv', mode='a', header=True)
 print(str(datetime.now()))
 
-for i in range(0, 1000):
-
+# for i in range(0, 1000):
+while True:
     if current_block_hash == end_block:
         break
     url = "https://www.blockchain.com/btc/block/" + current_block_hash
@@ -28,14 +27,8 @@ for i in range(0, 1000):
     data = usock.read()
     usock.close()
     soup = BS(data)
-    # print(soup.find('table',{'class':'table table-striped'}))
-    # print(soup.find('div',{'class':'col-md-6 col-sm-6'}))
-    # print(soup.find_all('td'))
-    # print(soup.get_text())
-    # for link in soup.find_all('td'):
-    # print(link.get_text())
 
-    print(soup.title.get_text())
+    # print(soup.title.get_text())
     hash = ""
     previous_block = ""
     next_block = ""
@@ -58,7 +51,7 @@ for i in range(0, 1000):
 
     for x in range(len(td_html)):
         link = td_html[x]
-        print(link.get_text())
+        # print(link.get_text())
         if link.get_text() == 'Hash':
             hash = td_html[x + 1].get_text()
             hash = hash.rstrip()
@@ -113,24 +106,17 @@ for i in range(0, 1000):
         if link.get_text() == 'Block Reward':
             block_reward = td_html[x + 1].get_text()
 
-    # print('----')
+    print('Current Hash')
     print(hash)
-    # print(previous_block)
-    # print(next_block)
-
-    # Creation of pandas data frame with columns.
-    # columns = [
-    #    'Number of Transactions', 'Output Total', 'Estimated Transaction Volume', 'Transaction Fees', 'Timestamp', 'Size',
-    #    'Block Reward', 'Hash']
 
     row = [[hash, previous_block, next_block, num_transactions, output_total, estimated_transaction_value,
             transaction_fees, height, timestamp, relayed_by, difficulty, bits, size, weight, version, nonce,
             block_reward]]
     df2 = pd.DataFrame(row, columns=columns)
-    df2.to_csv('my_csv.csv', mode='a', header=False)
+    df2.to_csv('my_csv5.csv', mode='a', header=False)
 
     current_block_hash = previous_block
 
-print(df)
-
+# print(df)
+print('End')
 print(str(datetime.now()))

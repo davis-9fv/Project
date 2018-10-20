@@ -13,6 +13,26 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.layers import LSTM
 
+
+def compare(y_test, y_predicted):
+    predictions = list()
+    for i in range(len(y_test)):
+        X = x_test[i]
+        yhat = y_predicted[i]
+        yhat = sc.inverse_transform(yhat)
+        yhat = yhat.flatten()
+        d = raw_values[upper_train:]
+
+        yhat = data_misc.inverse_difference(d, yhat[0], len(y_test) + 1 - i)
+        predictions.append(yhat)
+
+    z = raw_values[upper_train :upper_train+testset_length]
+
+    rmse = sqrt(mean_squared_error(z, predictions))
+    # rmse = sqrt(mean_squared_error(y_test, y_predicted))
+    return rmse, predictions
+
+
 # load dataset
 series = read_csv('../data/airline-passengers.csv', header=0, sep='\t')
 
@@ -20,19 +40,21 @@ numpy.random.seed(seed=9)
 
 date = series['Date'].values
 date = numpy.delete(date, (-1), axis=0)
+series['Passangers'].to_csv('../data/out.csv',  index = False)
 
-raw_values = series['Passangers']
+raw_values = series['Passangers'].values
 print(len(raw_values))
+diff_values = data_misc.difference(raw_values, 1)
 
 batch_size = 10
 nb_epoch = 300
-length = data_misc.get_train_length(dataset=raw_values, batch_size=batch_size, test_percent=0.20)
+length = data_misc.get_train_length(dataset=diff_values, batch_size=batch_size, test_percent=0.20)
 print(length)
 
 timesteps = 3
 
 upper_train = length + timesteps * 2
-df_data_1_train = raw_values[0:upper_train]
+df_data_1_train = diff_values[0:upper_train]
 training_set = df_data_1_train.values
 # reshaping
 training_set = numpy.reshape(training_set, (training_set.shape[0], 1))
@@ -70,7 +92,7 @@ regressor_mae = Model(inputs=inputs_1_mae, outputs=output_1_mae)
 regressor_mae.compile(optimizer='adam', loss='mae')
 regressor_mae.summary()
 
-epochs = 200
+epochs = 2
 for i in range(epochs):
     print("Epoch: " + str(i))
     regressor_mae.fit(X_train, y_train, shuffle=False, epochs=1, batch_size=batch_size)
@@ -86,7 +108,7 @@ print(testset_length)
 print(upper_train, upper_test, len(raw_values))
 
 # df_data_1_test = raw_values[upper_train - 1:upper_test]
-df_data_1_test = raw_values[upper_train:upper_test]
+df_data_1_test = diff_values[upper_train:upper_test]
 test_set = df_data_1_test.values
 
 # reshaping
@@ -96,6 +118,8 @@ test_set = numpy.reshape(test_set, (test_set.shape[0], 1))
 test_set = sc.fit_transform(numpy.float64(test_set))
 
 x_test, y_test = data_misc.test_data_to_timesteps(test=test_set, testset_length=testset_length, timesteps=timesteps)
+
+rmse, predictions = compare(y_test, y_test)
 
 predicted_bcg_values_test_mae = regressor_mae.predict(x_test, batch_size=batch_size)
 regressor_mae.reset_states()
@@ -136,6 +160,6 @@ y_test_1 = y_test_1.flatten()
 y_test_2 = y_test_2.flatten()
 y_test_3 = y_test_3.flatten()
 
-misc.plot_line_graph2('LSTM_rmse_', date[-20:], y_test_1, y_hat_1)
-misc.plot_line_graph2('LSTM_rmse_', date[-20:], y_test_2, y_hat_2)
-misc.plot_line_graph2('LSTM_rmse_', date[-20:], y_test_3, y_hat_3)
+misc.plot_line_graph2('LSTM_rmse_1', date[-20:], y_hat_1, y_hat_1)
+misc.plot_line_graph2('LSTM_rmse_2', date[-20:], y_hat_2, y_hat_2)
+misc.plot_line_graph2('LSTM_rmse_3', date[-20:], y_hat_3, y_hat_3)

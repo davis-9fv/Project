@@ -35,7 +35,7 @@ def compare_test(y_test, y_predicted):
     return rmse, predictions
 
 
-window_size = 15  # 15
+window_size = 15 # 15
 series = read_csv('../data/airline-passengers.csv', header=0, sep='\t')
 date = series['Date']
 series = series.drop(['Date'], axis=1)

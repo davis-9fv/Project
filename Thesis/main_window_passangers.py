@@ -11,8 +11,15 @@ def compare(y_test, y_predicted):
     return rmse
 
 
-window_size = 15  # 15
+
+
+
+window_size = 12  # 15
 series = read_csv('../data/airline-passengers.csv', header=0, sep='\t')
+for i in range(0,30):
+    corr = series['Passangers'].autocorr(lag=i)
+    print('Corr: %.2f Lang: %i' % (corr, i))
+
 date = series['Date']
 series = series.drop(['Date'], axis=1)
 date = date.iloc[window_size:]
@@ -125,6 +132,6 @@ for i in range(len(y_test)):
 
 titles = ['Y', 'ElasticNet', 'ElasticNet Future']
 data = [y, y_1, y_2]
-# misc.plot_lines_graph('Models, Test Data ', date, titles, data)
+misc.plot_lines_graph('Models, Test Data ', date, titles, data)
 
 # print(y)

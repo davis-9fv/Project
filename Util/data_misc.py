@@ -36,16 +36,25 @@ def invert_scale(scaler, X, value):
 def difference(dataset, interval=1):
     diff = list()
     for i in range(interval, len(dataset)):
+        num1 = dataset[i]
+        num2 = dataset[i - interval]
+
         value = dataset[i] - dataset[i - interval]
         diff.append(value)
     return Series(diff)
 
 
 # invert differenced value
-# Trabaja perfectamente, se come el primer valor de la data
+# Trabaja perfectamente, elimina el primer valor de la data
 def inverse_difference(history, yhat, interval=1):
     value = history[-interval]
     result = yhat + value
+    return result
+
+
+def inverse_difference2(first_raw_element, train_diff, yhat):
+    sum_train_diff = sum(float(i) for i in train_diff)
+    result = yhat + sum_train_diff + first_raw_element
     return result
 
 
@@ -93,7 +102,7 @@ def get_train_length(dataset, batch_size, test_percent):
     return (max(train_length_values))
 
 
-def get_test_length(dataset, batch_size,upper_train,timesteps):
+def get_test_length(dataset, batch_size, upper_train, timesteps):
     test_length_values = []
     for x in range(len(dataset) - 200, len(dataset) - timesteps * 2):
         modulo = (x - upper_train) % batch_size
@@ -101,6 +110,7 @@ def get_test_length(dataset, batch_size,upper_train,timesteps):
             test_length_values.append(x)
             print(x)
     return (max(test_length_values))
+
 
 # Creating a data structure with n timesteps
 def data_to_timesteps(train, length, timesteps):

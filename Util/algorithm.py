@@ -27,7 +27,7 @@ def elastic_net(x_train, y_train, x_to_predict, y_test):
             row.append(x_to_predict[i][j])
         # print(row)
 
-    #print('predicted')
+    # print('predicted')
     x = x_to_predict[0]
     x_future = list()
     y_future = list()
