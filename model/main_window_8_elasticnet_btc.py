@@ -36,7 +36,7 @@ for i in range(0, iterations):
 
     series = series.iloc[::-1]
     date = series['Date']
-    weekday = series['Weekday']
+    weekday = series['day_of_week']
     avg = series['Avg']
     date = date.iloc[window_size:]
     date = date.values
