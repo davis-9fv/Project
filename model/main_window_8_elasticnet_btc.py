@@ -1,4 +1,6 @@
 from pandas import read_csv
+from pandas import concat
+from pandas import DataFrame
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 from Util import misc
@@ -7,6 +9,7 @@ from sklearn.linear_model import ElasticNet
 from sklearn.utils import shuffle
 import numpy as np
 import datetime
+from Util import algorithm
 
 
 def compare(y_test, y_predicted):
@@ -15,28 +18,49 @@ def compare(y_test, y_predicted):
 
 
 time_start = datetime.datetime.now()
-print(time_start.strftime('%Y-%m-%d %H:%M:%S'))
-
 result = list()
-execute_train = False
-
-iterations = 200
+shuffle_data = False
+iterations = 1
 x_iteration = [x for x in range(0, iterations)]
 y_rmse = [0 for x in range(0, iterations)]
 
+print('Start time: %s' % str(time_start.strftime('%Y-%m-%d %H:%M:%S')))
+print('Iterations: %i' % (iterations))
+print('Shuffle: %i' % (shuffle_data))
+
 for i in range(0, iterations):
-    window_size = 8  # 15
+    window_size = 7  # 15
+    print('Window Size: %i' % (window_size))
+
     series = read_csv('C:/tmp/bitcoin/bitcoin_usd_bitcoin_block_chain_by_day.csv', header=0, sep=',')
 
     series = series.iloc[::-1]
     date = series['Date']
-    series = series['Avg']
+    weekday = series['Weekday']
+    avg = series['Avg']
     date = date.iloc[window_size:]
     date = date.values
 
-    raw_values = series.values
-    raw_values = data_misc.timeseries_to_supervised(raw_values, window_size)
-    raw_values = shuffle(raw_values)
+    avg_values = avg.values
+    # weekday_raw_values = weekday.values
+    avg_values = data_misc.timeseries_to_supervised(avg_values, window_size)
+    # weekday_raw_values = data_misc.timeseries_to_supervised(weekday_raw_values, window_size)
+    # raw_values = concat([weekday_raw_values, avg_values], axis=1, join_axes=[avg_values.index])
+
+    weekday = data_misc.cat_to_num(weekday)
+    weekday = DataFrame({'Day 0': weekday[0],
+                         'Day 1': weekday[1],
+                         'Day 2': weekday[2],
+                         'Day 3': weekday[3],
+                         'Day 4': weekday[4],
+                         'Day 5': weekday[5],
+                         'Day 6': weekday[6]})
+
+    raw_values = concat([weekday, avg_values], axis=1, join_axes=[avg_values.index])
+
+    if shuffle_data:
+        raw_values = shuffle(raw_values)
+
     # print(raw_values)
     raw_values = raw_values.values[window_size:, :]
 
@@ -61,12 +85,7 @@ for i in range(0, iterations):
     print('RMSE Dummy   %.3f' % (rmse))
 
     # ElasticNet
-    # alphas = np.logspace(-1, 2, 70)
-    # for alpha in alphas:
-    # print(alpha)
-    regr = ElasticNet(random_state=0, max_iter=12000, alpha=0.1)
-    regr.fit(x_train, y_train)
-    y_predicted_en = regr.predict(x_test)
+    y_predicted_en, y_future_en = algorithm.elastic_net(x_train, y_train, x_test, y_test)
     rmse = compare(y_test, y_predicted_en)
     print('RMSE Elastic %.3f' % (rmse))
     y_rmse[i] = rmse
@@ -80,6 +99,7 @@ for i in range(0, iterations):
     date_test = date[split:]
     print('Length date test:' + str(len(date_test)))
     print('Length data test:' + str(len(y_test)))
+    misc.plot_lines_graph('Test Data ', date_test, titles, data)
 
 # print(y)
 
@@ -87,5 +107,5 @@ misc.plot_one_line('Shuflle of the data', x_iteration, y_rmse, 'Iteration', 'RMS
 print(sum(y_rmse) / float(len(y_rmse)))
 
 time_end = datetime.datetime.now()
-print(time_end.strftime('%Y-%m-%d %H:%M:%S'))
+print('End time: %s' % str(time_end.strftime('%Y-%m-%d %H:%M:%S')))
 print('Duration of the script: %s' % (str(time_end - time_start)))
