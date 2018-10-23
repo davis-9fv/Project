@@ -37,6 +37,7 @@ columns = ['Open',
            'input_total', 'input_total_usd', 'output_total', 'output_total_usd', 'fee_total',
            'fee_total_usd', 'generation', 'reward', 'size', 'weight', 'stripped_size']
 
+
 result = list()
 y_rmse = [0 for x in range(0, len(columns))]
 for i in range(0, len(columns)):
