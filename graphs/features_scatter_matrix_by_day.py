@@ -12,7 +12,8 @@ from bokeh.sampledata.unemployment1948 import data
 from bokeh.transform import transform
 
 path = 'C:/tmp/bitcoin/'
-input_file = 'bitcoin_usd_bitcoin_block_chain_by_day.csv'
+#input_file = 'bitcoin_usd_bitcoin_block_chain_by_day.csv'
+input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 dfx = pd.read_csv(path + input_file, header=0, sep=',')
 title = 'Block chain Info by day'
 date = dfx['Date'].values
@@ -77,8 +78,13 @@ p6 = misc.create_figure(label='USD', width=width, height=height, date=date,
                         column=dfx['input_total_usd'].values, legend='input_total_usd', color=usd_color)
 p7 = misc.create_figure(label='USD', width=width, height=height, date=date,
                         column=dfx['output_total_usd'].values, legend='output_total_usd', color=usd_color)
+
+p8 = misc.create_figure(label='Percentage', width=width, height=height, date=date,
+                        column=dfx['Trend'].values, legend='Trend', color=bytes_color)
+
+
 p = gridplot([m1], [m2], [m3], [m4], [m5], [m6], [m7], [m8], [m9], [m10], [m11],
-             [m12], [m13], [m14], [p1], [p2], [p3], [p4], [p5], [p6], [p7])
+             [m12], [m13], [m14], [p1], [p2], [p3], [p4], [p5], [p6], [p7], [p8])
 
 # show the results
 show(p)

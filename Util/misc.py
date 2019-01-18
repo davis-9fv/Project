@@ -63,11 +63,11 @@ def plot_data_graph2(algorithm_name="Unkown", date=[], data=[]):
 
 def plot_lines_graph(title="Unkown", date=[], titles=[], data=[]):
     p1 = figure(x_axis_type="datetime", title=title + ' - Total of Passangers')
-    p1.grid.grid_line_alpha = 0.8
+    p1.grid.grid_line_alpha = 1
     p1.xaxis.axis_label = 'Date'
     p1.yaxis.axis_label = 'Quantity'
     colors = ['red', 'blue', 'black', 'yellow', 'green', 'gray', 'pink', 'orange']
-    line_dash = ['4 3', '5 4', '6 5', '7 6', '8 7', '9 8', '10 9']
+    line_dash = ['4 3', '5 4', '6 5', '7 6', '8 7', '9 8', '10 9', '10 9' ]
 
     # p1.line(pd.to_datetime(date), [0,1000], line_width=2)
 

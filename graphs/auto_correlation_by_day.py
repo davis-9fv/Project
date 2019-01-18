@@ -10,7 +10,9 @@ def compare(y_test, y_predicted):
 
 
 path = 'C:/tmp/bitcoin/'
-input_file = 'bitcoin_usd_bitcoin_block_chain_by_day.csv'
+#input_file = 'bitcoin_usd_bitcoin_block_chain_by_day.csv'
+input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
+
 dfx = pd.read_csv(path + input_file, header=0, sep=',')
 print(dfx.shape)
 max_lag=dfx.shape[0]

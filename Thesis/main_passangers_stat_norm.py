@@ -97,7 +97,7 @@ rmse = compare_train(train_scaled, y_hat_predicted)
 print('RMSE Dummy   %.3f' % (rmse))
 
 # ElasticNet
-y_hat_predicted = algorithm.elastic_net2(x_train, y_train, x_train)
+y_hat_predicted = algorithm.elastic_net2(x_train, y_train, x_train, normalize=False)
 rmse = compare_train(train_scaled, y_hat_predicted)
 print('RMSE Elastic %.3f' % (rmse))
 
@@ -133,7 +133,7 @@ rmse, y_predicted_real_dummy = compare_test(test_scaled, y_hat_predicted)
 print('RMSE Dummy   %.3f' % (rmse))
 
 # ElasticNet
-y_hat_predicted = algorithm.elastic_net2(x_train, y_train, x_test)
+y_hat_predicted = algorithm.elastic_net2(x_train, y_train, x_test, normalize=False)
 rmse, y_predicted_en = compare_test(test_scaled, y_hat_predicted)
 print('RMSE Elastic %.3f' % (rmse))
 
@@ -152,12 +152,17 @@ y_hat_predicted = algorithm.sgd_regressor(x_train, y_train, x_test)
 rmse, y_predicted_sgd = compare_test(test_scaled, y_hat_predicted)
 print('RMSE SGD     %.3f' % (rmse))
 
+# Lasso
+y_hat_predicted = algorithm.lasso(x_train, y_train, x_test, normalize=False)
+rmse, y_predicted_la = compare_test(test_scaled, y_hat_predicted)
+print('RMSE Lasso   %.3f' % (rmse))
+
 # LSTM
-y_hat_predicted = algorithm.lstm(x_train, y_train, x_test, batch_size=1, nb_epoch=3, neurons=1)
+y_hat_predicted = algorithm.lstm(x_train, y_train, x_test, batch_size=1, nb_epoch=200, neurons=3)
 rmse, y_predicted_lstm = compare_test(test_scaled, y_hat_predicted)
 print('RMSE LSTM   %.3f' % (rmse))
 
-titles = ['X', 'Y', 'ElasticNet', 'KNN5', 'KNN10', 'SGD', 'LSTM']
+titles = ['X', 'Y', 'ElasticNet', 'KNN5', 'KNN10', 'SGD', 'Lasso','LSTM']
 data = [raw_values[split:-1], y_predicted_real, y_predicted_en, y_predicted_knn5, y_predicted_knn10, y_predicted_sgd,
-        y_predicted_lstm]
+        y_predicted_la,y_predicted_lstm]
 misc.plot_lines_graph('Stationary - Normalization, Test Data ', date[split:], titles, data)

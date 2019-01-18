@@ -7,6 +7,7 @@ from Util import data_misc
 from sklearn.utils import shuffle
 import datetime
 from Util import algorithm
+import numpy as np
 
 
 def compare(y_test, y_predicted):
@@ -16,8 +17,8 @@ def compare(y_test, y_predicted):
 
 time_start = datetime.datetime.now()
 result = list()
-shuffle_data = False
-write_file = True
+shuffle_data = True
+write_file = False
 iterations = 1
 x_iteration = [x for x in range(0, iterations)]
 # y_rmse = [0 for x in range(0, iterations)]
@@ -27,24 +28,26 @@ print('Iterations: %i' % (iterations))
 print('Shuffle: %i' % (shuffle_data))
 
 path = 'C:/tmp/bitcoin/'
-input_file = 'bitcoin_usd_bitcoin_block_chain_by_day.csv'
+#input_file = 'bitcoin_usd_bitcoin_block_chain_by_day.csv'
+input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 output_file = 'main_window_8_elasticnet_btc.csv'
 
-# columns = ['Open', 'day_of_month', 'day_of_week', 'day_of_year', 'month_of_year', 'week_of_year_column', 'year']
+columns = ['size','reward']
+"""
 columns = ['Open',
            'High', 'Low', 'Close', 'day_of_week', 'day_of_month', 'day_of_year', 'month_of_year',
            'year', 'week_of_year_column', 'transaction_count', 'input_count', 'output_count',
            'input_total', 'input_total_usd', 'output_total', 'output_total_usd', 'fee_total',
            'fee_total_usd', 'generation', 'reward', 'size', 'weight', 'stripped_size']
-
-
+"""
+window_size = 7 # 7
 result = list()
 y_rmse = [0 for x in range(0, len(columns))]
 for i in range(0, len(columns)):
     print('')
     print('')
-    print(columns[i])
-    window_size = 7  # 15
+    print('Column: '+ columns[i])
+
     print('Window Size: %i' % (window_size))
 
     series = read_csv(path + input_file, header=0, sep=',')
@@ -59,27 +62,18 @@ for i in range(0, len(columns)):
     avg_values = avg.values
     weekday_raw_values = weekday.values
     avg_values = data_misc.timeseries_to_supervised(avg_values, window_size)
-    weekday_raw_values = data_misc.timeseries_to_supervised(weekday_raw_values, window_size)
-    raw_values = concat([weekday_raw_values, avg_values], axis=1, join_axes=[avg_values.index])
 
-    """
-    weekday = data_misc.cat_to_num(weekday)
-    weekday = DataFrame({'Day 0': weekday[0],
-                         'Day 1': weekday[1],
-                         'Day 2': weekday[2],
-                         'Day 3': weekday[3],
-                         'Day 4': weekday[4],
-                         'Day 5': weekday[5],
-                         'Day 6': weekday[6]})
+    # The first [Window size number] contains zeros which need to be cut.
+    avg_values = avg_values.values[window_size:, :]
+    # We cut from the beginning to pair with the supervised values.
+    weekday_raw_values = weekday_raw_values[:-window_size]
 
-    raw_values = concat([weekday, avg_values], axis=1, join_axes=[avg_values.index])
-    """
+    # Concatenate with numpy
+    raw_values = np.concatenate((weekday_raw_values[:, None], avg_values), axis=1)
     if shuffle_data:
         raw_values = shuffle(raw_values)
 
-
     # print(raw_values)
-    raw_values = raw_values.values[window_size:, :]
 
     size_raw_values = len(raw_values)
     split = int(size_raw_values * 0.80)
@@ -120,9 +114,10 @@ for i in range(0, len(columns)):
 print(columns)
 print(y_rmse)
 
+df = DataFrame({'Columns': columns,
+                    'RMSE': y_rmse})
+print(df)
 if write_file:
-    df = DataFrame({'Columns': columns,
-                    'SelectKBest': y_rmse})
     df.to_csv(path + output_file, header=True)
 
 time_end = datetime.datetime.now()

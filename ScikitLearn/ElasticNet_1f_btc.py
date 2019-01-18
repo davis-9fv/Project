@@ -6,7 +6,7 @@ from math import sqrt
 from Util import misc
 from Util import data_misc
 
-series = read_csv('../Thesis/Bitcoin_historical_data_processed_1f.csv', header=0, sep='\t')
+series = read_csv('../data/Bitcoin_historical_data_processed_1f.csv', header=0, sep='\t')
 
 # transform data to be stationary
 raw_values = series['Avg'].values
@@ -65,6 +65,6 @@ rmse = sqrt(mean_squared_error(raw_values[-365:], predictions))
 print('Test RMSE: %.7f' % (rmse))
 misc.plot_line_graph2('ElasticNet', date[-365:], raw_values[-365:], predictions)
 misc.plot_data_graph2('Data', date, raw_values)
-misc.print_comparison_list('Raw', raw_values[-365:], predictions)
+#misc.print_comparison_list('Raw', raw_values[-365:], predictions)
 
 

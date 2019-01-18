@@ -11,7 +11,6 @@ def compare_train(y_test, y_predicted):
     d = raw_values[window_size:split + window_size + 1]
     for i in range(len(y_train)):
         yhat = y_predicted[i]
-
         yhat = data_misc.inverse_difference(d, yhat, len(y_train) + 1 - i)
         predictions.append(yhat)
 
@@ -35,7 +34,7 @@ def compare_test(y_test, y_predicted):
     return rmse, predictions
 
 
-window_size = 15 # 15
+window_size = 15  # 15
 series = read_csv('../data/airline-passengers.csv', header=0, sep='\t')
 date = series['Date']
 series = series.drop(['Date'], axis=1)
@@ -72,7 +71,7 @@ rmse, y_predicted = compare_train(x_test, y_hat_predicted)
 print('RMSE Dummy   %.3f' % (rmse))
 
 # ElasticNet
-y_hat_predicted = algorithm.elastic_net2(x_train, y_train, x_train)
+y_hat_predicted = algorithm.elastic_net2(x_train, y_train, x_train, normalize=False)
 rmse, y_predicted = compare_train(x_test, y_hat_predicted)
 print('RMSE Elastic %.3f' % (rmse))
 
@@ -108,11 +107,11 @@ rmse, y_predicted_dummy = compare_test(y_test, y_predicted_dummy_es)
 print('RMSE Dummy   %.3f' % (rmse))
 
 # ElasticNet
-y_predicted_en_es, y_future_en_es = algorithm.elastic_net(x_train, y_train, x_test, y_test)
+y_predicted_en_es, y_future_en_es = algorithm.elastic_net(x_train, y_train, x_test, y_test, normalize=False)
 rmse, y_predicted_en = compare_test(y_test, y_predicted_en_es)
 print('RMSE Elastic %.3f' % (rmse))
 
-y_future_en = compare_test(y_test, y_future_en_es)
+# y_future_en = compare_test(y_test, y_future_en_es)
 
 # KNN5
 y_predicted_knn5_es = algorithm.knn_regressor(x_train, y_train, x_test, 5)
@@ -129,12 +128,17 @@ y_predicted_sgd_es = algorithm.sgd_regressor(x_train, y_train, x_test)
 rmse, y_predicted_sgd = compare_test(y_test, y_predicted_sgd_es)
 print('RMSE SGD     %.3f' % (rmse))
 
+# Lasso
+y_predicted_la_es = algorithm.lasso(x_train, y_train, x_test, normalize=False)
+rmse, y_predicted_la = compare_test(y_test, y_predicted_la_es)
+print('RMSE Lasso    %.3f' % (rmse))
+
 # titles = ['Y', 'ElasticNet', 'ElasticNet Future', 'KNN5', 'KNN10']
 # y_future_en = y_future_en[1]
 # data = [y_hat_predicted, y_predicted_en, y_future_en, y_predicted_knn5, y_predicted_knn10]
 
-titles = [' ', 'Y', 'ElasticNet', 'KNN5', 'KNN10']
-data = [[], y_hat_predicted, y_predicted_en, y_predicted_knn5, y_predicted_knn10]
+titles = ['Y', 'ElasticNet', 'KNN5', 'KNN10', 'SGD', 'Lasso']
+data = [y_hat_predicted, y_predicted_en, y_predicted_knn5, y_predicted_knn10, [], y_predicted_la]
 
 date_test = date[split + 1:]
 print('Length date test:' + str(len(date_test)))
@@ -145,6 +149,7 @@ misc.plot_lines_graph('Stationary, Test Data ', date_test, titles, data)
 data = [y_test, y_predicted_en_es, y_future_en_es, y_predicted_knn5_es, y_predicted_knn10_es]
 misc.plot_lines_graph('Stationary, Test Data ', date_test, titles, data)
 
+"""
 y = list()
 y_1 = list()
 y_2 = list()
@@ -168,3 +173,4 @@ for i in range(len(y_test)):
 titles = ['Y', 'ElasticNet', 'ElasticNet Future', 'KNN5', 'KNN10']
 data = [y, y_1, y_2, y_3, y_4]
 misc.plot_lines_graph('Stationary, Test Data ', date, titles, data)
+"""

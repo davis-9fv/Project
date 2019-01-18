@@ -71,7 +71,7 @@ rmse, y_predicted = compare_train(y_train, y_predicted_dummy)
 print('RMSE Dummy   %.3f' % (rmse))
 
 # ElasticNet
-y_predicted_en = algorithm.elastic_net2(x_train, y_train, x_train)
+y_predicted_en = algorithm.elastic_net2(x_train, y_train, x_train, normalize=False)
 rmse, y_predicted = compare_train(y_train, y_predicted_en)
 print('RMSE Elastic %.3f' % (rmse))
 
@@ -103,12 +103,12 @@ rmse, y_predicted_dummy = compare_test(y_test, y_predicted_dummy_sc)
 print('RMSE Dummy   %.3f' % (rmse))
 
 # ElasticNet
-y_predicted_en_sc, y_future_en_sc = algorithm.elastic_net(x_train, y_train, x_test, y_test)
+y_predicted_en_sc, y_future_en_sc = algorithm.elastic_net(x_train, y_train, x_test, y_test, normalize=False)
 rmse, y_predicted_en = compare_test(y_test, y_predicted_en_sc)
 print('RMSE Elastic %.3f' % (rmse))
 
-rmse, y_future_en = compare_test(y_test, y_future_en_sc)
-print('RMSE Fut Els %.3f' % (rmse))
+# rmse, y_future_en = compare_test(y_test, y_future_en_sc)
+# print('RMSE Fut Els %.3f' % (rmse))
 
 # KNN5
 y_predicted_knn5_sc = algorithm.knn_regressor(x_train, y_train, x_test, 5)
@@ -125,13 +125,23 @@ y_predicted_sgd_sc = algorithm.sgd_regressor(x_train, y_train, x_test)
 rmse, y_predicted_sgd = compare_test(y_test, y_predicted_sgd_sc)
 print('RMSE SGD     %.3f' % (rmse))
 
+# Lasso
+y_predicted_la_sc = algorithm.lasso(x_train, y_train, x_test, normalize=False)
+rmse, y_predicted_la = compare_test(y_test, y_predicted_la_sc)
+print('RMSE Lasso   %.3f' % (rmse))
+
+# LSTM
+y_predicted_lstm = algorithm.lstm(x_train, y_train, x_test, batch_size=1, nb_epoch=200, neurons=3)
+rmse, y_predicted_lstm = compare_test(y_test, y_predicted_lstm)
+print('RMSE LSTM    %.3f' % (rmse))
+
 # print('Y_test')
 # print(y_test)
 
-# titles = ['', 'Y', 'ElasticNet', 'ElasticNet Future', 'KNN5', 'KNN10', 'SGD']
-# data = [[], y_test, y_predicted_en, y_future_en, y_predicted_knn5, y_predicted_knn10, y_predicted_sgd]
-titles = ['', 'Y', 'ElasticNet', 'KNN5', 'KNN10', 'SGD']
-data = [[], y_test, y_predicted_en, y_predicted_knn5, y_predicted_knn10, y_predicted_sgd]
+titles = ['Y', 'ElasticNet', 'KNN5', 'KNN10', 'SGD', 'Lasso']
+data = [y_test, y_predicted_en, y_predicted_knn5, y_predicted_knn10, y_predicted_sgd, y_predicted_la]
+# titles = ['', 'Y', 'ElasticNet', 'KNN5', 'KNN10', 'SGD']
+# data = [[], y_test, y_predicted_en, y_predicted_knn5, y_predicted_knn10, y_predicted_sgd]
 
 date_test = date[split:]
 print('Length date test:' + str(len(date_test)))
@@ -139,21 +149,23 @@ print('Length data test:' + str(len(y_test)))
 
 misc.plot_lines_graph('Normalization, Test Data ', date_test, titles, data)
 
+"""
 y = list()
 y_1 = list()
 y_2 = list()
 for i in range(len(y_train)):
     y.append(float(y_train[i]))
     y_1.append(float(y_train[i]))
-    y_2.append(float(y_train[i]))
+#    y_2.append(float(y_train[i]))
 
 for i in range(len(y_test)):
     y.append(float(y_test[i]))
     y_1.append(float(y_predicted_en[i]))
-    y_2.append(float(y_future_en[i]))
+#    y_2.append(float(y_future_en[i]))
 
 titles = ['Y', 'ElasticNet', 'ElasticNet Future']
 data = [y, y_1, y_2]
 misc.plot_lines_graph('Normalization, Test Data ', date, titles, data)
 
 # print(y)
+"""

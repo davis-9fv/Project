@@ -6,7 +6,8 @@ from bokeh.plotting import figure
 from bokeh.transform import transform
 
 path = 'C:/tmp/bitcoin/'
-input_file = 'bitcoin_usd_bitcoin_block_chain_by_day.csv'
+#input_file = 'bitcoin_usd_bitcoin_block_chain_by_day.csv'
+input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 dfx = pd.read_csv(path + input_file, header=0, sep=',')
 
 df = pd.DataFrame()
@@ -32,6 +33,8 @@ df['Close'] = dfx['Close']
 
 df['Avg'] = dfx['Avg']
 df['Market Cap'] = dfx['Market Cap']
+
+df['Trend'] = dfx['Trend']
 
 cor_matrix = df.corr(method='pearson', min_periods=1)
 
@@ -61,7 +64,7 @@ print(cor_matrix.index)
 source = ColumnDataSource(df)
 
 # this is the colormap from the original NYTimes plot
-colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce", "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
+colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce", "#ddb7b1", "#cc7878", "#933b41", "#550b1d","#110206"]
 mapper = LinearColorMapper(palette=colors, low=df.value.min(), high=df.value.max())
 
 TOOLS = "hover,save,pan,box_zoom,reset,wheel_zoom"
