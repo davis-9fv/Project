@@ -98,7 +98,7 @@ window_size_opt = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
 # window_size_opt = [5]
 
 lag = [1]
-bitcoin_columns_opt = values.bitcoin_columns_opt_test
+bitcoin_columns_opt = values.bitcoin_columns_opt_pro
 trend_columns_opt = [
     ['Trend']
 ]
