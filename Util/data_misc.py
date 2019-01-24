@@ -7,6 +7,7 @@ from pandas import unique
 import numpy
 from pandas import concat
 from numpy import mean
+from scipy.stats.stats import pearsonr
 
 
 # scale train and test data to [-1, 1]
@@ -25,16 +26,17 @@ def scale(train, test):
 
 # inverse scaling for a forecasted value
 def invert_scale(scaler, X, value):
-    new_row = [x for x in X]+ [value]
+    new_row = [x for x in X] + [value]
     array = numpy.array(new_row)
     array = array.reshape(1, len(array))
     inverted = scaler.inverse_transform(array)
     return inverted[0, -1]
 
+
 # inverse scaling for a forecasted value
 def invert_scale_array(scaler, X, values):
     new_row = [x for x in X]
-    for i in range(0,len(values)):
+    for i in range(0, len(values)):
         new_row = new_row + [values[i]]
     array = numpy.array(new_row)
     array = array.reshape(1, len(array))
@@ -72,7 +74,7 @@ def inverse_difference2(first_raw_element, train_diff, yhat):
 # frame a sequence as a supervised learning problem
 def timeseries_to_supervised(data, lag=1):
     df = DataFrame(data)
-    columns = [df.shift(i) for i in range(lag,0,-1 )]
+    columns = [df.shift(i) for i in range(lag, 0, -1)]
     columns.append(df)
     df = concat(columns, axis=1)
     df.fillna(0, inplace=True)
@@ -178,6 +180,7 @@ def test_data_to_timesteps(test, testset_length, timesteps):
     y_test = numpy.reshape(y_test, (y_test.shape[0], y_test.shape[1], 1))
     return X_test, y_test
 
+
 # Convert categorical features to numerical binary features
 def cat_to_num(data):
     categories = unique(data)
@@ -193,3 +196,10 @@ def slide_data(data, lag=2):
     data = data[lag:]
     data_previous = data_previous[:-lag]
     return data, data_previous
+
+
+def correlation(col1, col2):
+    df = DataFrame({'col1': col1, 'col2': col2})
+    corr_matrix = df.corr(method='pearson', min_periods=1)
+    result = corr_matrix.iloc[0,1]
+    return result

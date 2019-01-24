@@ -1,10 +1,12 @@
 from matplotlib import pyplot
 from bokeh.layouts import gridplot
 from bokeh.plotting import figure, show, output_file
+from bokeh.models import Span
 
 import pandas as pd
 
 TOOLS = "hover,save,pan,box_zoom,reset,wheel_zoom"
+
 
 def print_comparison(title, expected, prediction):
     print('%s:: Y expected: %.3f   Y predicted: %.3f' % (title, expected, predictions))
@@ -67,7 +69,7 @@ def plot_lines_graph(title="Unkown", date=[], titles=[], data=[]):
     p1.xaxis.axis_label = 'Date'
     p1.yaxis.axis_label = 'Quantity'
     colors = ['red', 'blue', 'black', 'yellow', 'green', 'gray', 'pink', 'orange']
-    line_dash = ['4 3', '5 4', '6 5', '7 6', '8 7', '9 8', '10 9', '10 9' ]
+    line_dash = ['4 3', '5 4', '6 5', '7 6', '8 7', '9 8', '10 9', '10 9']
 
     # p1.line(pd.to_datetime(date), [0,1000], line_width=2)
 
@@ -97,3 +99,24 @@ def create_figure(label='label', width=800, height=150, date=[], column=[], lege
     p.yaxis.axis_label = label
     p.legend.location = "top_left"
     return p
+
+
+def plot_cross_validation(title="Cross Validation", alphas=[], best_alpha=0, rmse_val=[], rmse_test=[]):
+    p1 = figure(title=title)
+    p1.grid.grid_line_alpha = 1
+    p1.xaxis.axis_label = 'Model Complexity'
+    p1.yaxis.axis_label = 'RMSE'
+    colors = ['red', 'blue', 'black']
+    line_dash = ['4 3', '5 4']
+
+    vline = Span(location=best_alpha, dimension='height', line_color='gray', line_width=1)
+    p1.renderers.extend([vline])
+
+    p1.line(best_alpha, rmse_val, color=colors[0], line_width=1)
+    p1.line(alphas, rmse_val, color=colors[0], line_width=1)
+    p1.line(alphas, rmse_test, color=colors[1], line_width=1)
+
+    p1.legend.location = "top_left"
+
+    output_file('../tmp/' + title + '.html', title=title)
+    show(gridplot([[p1]], plot_width=500, plot_height=300))  # open a browser

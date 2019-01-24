@@ -20,74 +20,113 @@ time_start = datetime.datetime.now()
 result = list()
 shuffle_data = False
 write_file = False
-use_columns = True
+#use_columns = False
 iterations = 1
 x_iteration = [x for x in range(0, iterations)]
 
 print('Start time: %s' % str(time_start.strftime('%Y-%m-%d %H:%M:%S')))
 print('Iterations: %i' % (iterations))
 print('Shuffle: %i' % (shuffle_data))
-print('use_columns: %i' % (use_columns))
+#print('use_columns: %i' % (use_columns))
 
 path = 'C:/tmp/bitcoin/'
 #input_file = 'bitcoin_usd_bitcoin_block_chain_by_day.csv'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 output_file = 'main_window_8_elasticnet_btc.csv'
+
+
+
 """
 columns = ['transaction_count','input_total','output_total','Trend']
+
 
 columns = ['Open',
            'High', 'Low', 'Close', 'day_of_week', 'day_of_month', 'day_of_year', 'month_of_year',
            'year', 'week_of_year_column', 'transaction_count', 'input_count', 'output_count',
            'input_total', 'input_total_usd', 'output_total', 'output_total_usd', 'fee_total',
            'fee_total_usd', 'generation', 'reward', 'size', 'weight', 'stripped_size', 'Trend']
-"""
+
 
 """
 
+"""
 # 12 best f_regression
-columns = ['High', 'Low', 'Close', 'Open', 'output_total_usd', 'input_total_usd',
-           'Trend', 'year', 'fee_total_usd', 'generation', 'input_count', 'size']
+columns = ['output_total_usd', 'input_total_usd',
+           'Trend', 'year', 'fee_total_usd', 'generation', 'input_count', 'size'
+    , 'fee_total', 'reward', 'output_count', 'weight']
 print('12 best f_regression')
 
-
 # 8 best f_regression
-columns = ['High', 'Low', 'Close', 'Open', 'output_total_usd', 'input_total_usd',
-           'Trend', 'year']
+columns = ['output_total_usd', 'input_total_usd',
+           'Trend', 'year', 'fee_total_usd', 'generation', 'input_count', 'size']
 print('8 best f_regression')
 
 """
 
-
 """
+
 # 12 best ExtraTreesClassifier
-columns = ['Low', 'High', 'Close', 'Open', 'day_of_year', 'day_of_month',
+columns = [ 'day_of_year', 'day_of_month',
            'reward', 'generation', 'fee_total_usd', 'output_count',
-           'output_total_usd', 'size']
+           'output_total_usd', 'size','input_count', 'input_total_usd', 'output_total', 'transaction_count']
 print('12 best ExtraTreesClassifier')
 
 
+
+
+"""
 # 8 best ExtraTreesClassifier
-columns = ['Low', 'High', 'Close', 'Open', 'day_of_year', 'day_of_month',
-           'reward', 'generation']
+columns = ['day_of_year', 'day_of_month',
+           'reward', 'generation', 'fee_total_usd', 'output_count',
+           'output_total_usd', 'size','input_count']
 print('8 best ExtraTreesClassifier')
 
 
-# 11 best f_regression - no high,low,close, open
-columns = ['Trend', 'year','transaction_count']
 
-print('11 best f_regression - no high,low,close, open')
+
 """
-
-
 # 11 best f_regression - no high,low,close, open
 columns = ['Trend', 'year', 'fee_total_usd', 'generation',
            'input_count', 'size', 'fee_total', 'reward', 'output_count',
            'weight', 'transaction_count']
-columns = ['Trend',
-           'input_count', 'size',  'reward', 'output_count',
-            'transaction_count']
+
 print('11 best f_regression - no high,low,close, open')
+"""
+
+
+"""
+# Union F_regression and ExtraTreesClassifier - no high,low,close, open
+columns = ['output_total_usd','input_total_usd','fee_total_usd',
+           'generation','input_count','size','reward','output_count'
+    ,'day_of_year','day_of_month','output_total'
+    ,'transaction_count','Trend','year','fee_total','weight']
+print('Union F_regression and ExtraTreesClassifier - no high,low,close, open')
+
+
+# Intersecion F_regression and ExtraTreesClassifier - no high,low,close, open
+columns = ['output_total_usd','input_total_usd','fee_total_usd',
+           'generation','input_count','size','reward','output_count']
+
+print('Intersecion F_regression and ExtraTreesClassifier - no high,low,close, open')
+
+
+
+
+
+# best 9 no usd - ExtraTreesClassifier - no high,low,close, open
+columns = [ 'output_total','transaction_count','day_of_week'
+    ,'input_total','generation', 'input_count', 'size', 'reward', 'output_count']
+print('ExtraTreesClassifier - no high,low,close, open')
+
+"""
+
+"""
+# best 9 no usd - F_regression - no high,low,close, open
+columns = ['Trend', 'year', 'generation', 'input_count', 'size', 'fee_total', 'reward', 'output_count', 'weight']
+print('F_regression - no high,low,close, open')
+
+
+"""
 
 
 
@@ -159,7 +198,7 @@ rmse = compare(y_test, y_hat_predicted)
 print('RMSE NoPredic  %.3f' % (rmse))
 
 # Dummy
-y_predicted_dummy = x_test[:, 0]
+y_predicted_dummy = x_test[:, -1]
 rmse = compare(y_test, y_predicted_dummy)
 print('RMSE Dummy   %.3f' % (rmse))
 

@@ -1,12 +1,13 @@
 from sklearn.utils import shuffle
 import datetime
 from Util import algorithm
+from pandas import DataFrame
 from pandas import read_csv
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 from Util import misc
 from Util import data_misc
-import numpy
+import numpy as np
 
 def compare(y_test, y_predicted):
     predictions = list()
@@ -28,34 +29,136 @@ def compare(y_test, y_predicted):
     return rmse, predictions
 
 seed = 5
-numpy.random.seed(seed)
+np.random.seed(seed)
 time_start = datetime.datetime.now()
 result = list()
 shuffle_data = False
 write_file = False
+use_columns = True
 
 print('Start time: %s' % str(time_start.strftime('%Y-%m-%d %H:%M:%S')))
 print('Shuffle: %i' % (shuffle_data))
+print('use_columns: %i' % (use_columns))
 
 path = 'C:/tmp/bitcoin/'
 #input_file = 'bitcoin_usd_11_10_2018.csv'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
-window_size = 7 # 7
+
+
+
+"""
+columns = ['transaction_count','input_total','output_total','Trend']
+
+columns = ['Open',
+           'High', 'Low', 'Close', 'day_of_week', 'day_of_month', 'day_of_year', 'month_of_year',
+           'year', 'week_of_year_column', 'transaction_count', 'input_count', 'output_count',
+           'input_total', 'input_total_usd', 'output_total', 'output_total_usd', 'fee_total',
+           'fee_total_usd', 'generation', 'reward', 'size', 'weight', 'stripped_size', 'Trend']
+
+
+
+
+
+"""
+
+
+
+"""
+# 12 best f_regression
+columns = ['output_total_usd', 'input_total_usd',
+           'Trend', 'year', 'fee_total_usd', 'generation', 'input_count', 'size'
+    , 'fee_total', 'reward', 'output_count', 'weight']
+print('12 best f_regression')
+
+# 8 best f_regression
+columns = ['output_total_usd', 'input_total_usd',
+           'Trend', 'year', 'fee_total_usd', 'generation', 'input_count', 'size']
+print('8 best f_regression')
+"""
+
+
+"""
+
+# 12 best ExtraTreesClassifier
+columns = [ 'day_of_year', 'day_of_month',
+           'reward', 'generation', 'fee_total_usd', 'output_count',
+           'output_total_usd', 'size','input_count', 'input_total_usd', 'output_total', 'transaction_count']
+print('12 best ExtraTreesClassifier')
+
+
+# 8 best ExtraTreesClassifier
+columns = ['day_of_year', 'day_of_month',
+           'reward', 'generation', 'fee_total_usd', 'output_count',
+           'output_total_usd', 'size','input_count']
+print('8 best ExtraTreesClassifier')
+"""
+
+
+
+
+"""
+# 11 best f_regression - no high,low,close, open
+columns = ['Trend', 'year', 'fee_total_usd', 'generation',
+           'input_count', 'size', 'fee_total', 'reward', 'output_count',
+           'weight', 'transaction_count']
+
+print('11 best f_regression - no high,low,close, open')
+"""
+
+"""
+# Intersecion F_regression and ExtraTreesClassifier - no high,low,close, open
+columns = ['output_total_usd','input_total_usd','fee_total_usd',
+           'generation','input_count','size','reward','output_count']
+
+print('Intersecion F_regression and ExtraTreesClassifier - no high,low,close, open')
+
+
+"""
+# Union F_regression and ExtraTreesClassifier - no high,low,close, open
+columns = ['output_total_usd','input_total_usd','fee_total_usd',
+           'generation','input_count','size','reward','output_count'
+    ,'day_of_year','day_of_month','output_total'
+    ,'transaction_count','Trend','year','fee_total','weight']
+print('Union F_regression and ExtraTreesClassifier - no high,low,close, open')
+
+"""
+# best 9 no usd - ExtraTreesClassifier - no high,low,close, open
+columns = [ 'output_total','transaction_count','day_of_week'
+    ,'input_total','generation', 'input_count', 'size', 'reward', 'output_count']
+print('ExtraTreesClassifier - no high,low,close, open')
+
+
+# best 9 no usd - F_regression - no high,low,close, open
+columns = ['Trend', 'year', 'generation', 'input_count', 'size', 'fee_total', 'reward', 'output_count', 'weight']
+print('F_regression - no high,low,close, open')
+
+"""
+
+
+
+
+window_size = 5 # 7
 result = list()
 print('')
 print('')
 print('Window Size: %i' % (window_size))
 
+
 # To pair with the other models, this model gets 1438 first rows.
 series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
-
 series = series.iloc[::-1]
+
+dfx = DataFrame()
+for column in columns:
+    dfx[column] = series[column]
+
 date = series['Date']
 avg = series['Avg']
 date = date.iloc[window_size:]
 date = date.values
 
 avg_values = avg.values
+raw_values = dfx.values
 # Stationary Data
 diff_values = data_misc.difference(avg_values, 1)
 #diff_values= avg_values
@@ -63,6 +166,21 @@ diff_values = data_misc.difference(avg_values, 1)
 supervised = data_misc.timeseries_to_supervised(diff_values, window_size)
 # The first [Window size number] contains zeros which need to be cut.
 supervised = supervised.values[window_size:, :]
+
+# We cut the first or last element to pair with the diff values.
+#raw_values = raw_values[1:, :]
+raw_values = raw_values[:-1, :]
+
+# We cut from the beginning to pair with the supervised values.
+raw_values = raw_values[:-window_size, :]
+
+print('-----')
+# Concatenate with numpy
+if use_columns:
+    supervised = np.concatenate((raw_values, supervised), axis=1)
+
+
+
 
 if shuffle_data:
     supervised = shuffle(supervised, random_state=9)
@@ -87,7 +205,7 @@ rmse, y_hat_predicted = compare(y_test, y_hat_predicted_es)
 print('RMSE NoPredic  %.3f' % (rmse))
 
 # Dummy
-y_predicted_dummy_es = x_test[:, 0]
+y_predicted_dummy_es = x_test[:, -1]
 rmse, y_predicted_dummy = compare(y_test, y_predicted_dummy_es)
 print('RMSE Dummy   %.3f' % (rmse))
 
