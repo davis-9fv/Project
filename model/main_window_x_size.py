@@ -1,5 +1,7 @@
 from sklearn.utils import shuffle
 import datetime
+import sys
+sys.path.insert(0, '/Util/')
 from Util import algorithm
 from pandas import DataFrame
 from pandas import read_csv
@@ -91,14 +93,14 @@ write_file = True
 plot = False
 
 cross_validation_opt = [False]
-use_bitcoin_data_opt = [True]
-use_trend_column_opt = [True]
-# window_size_opt = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+use_bitcoin_data_opt = [True, False]
+use_trend_column_opt = [True, False]
+window_size_opt = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
 # window_size_opt = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 window_size_opt = [5]
 
 lag = [1]
-bitcoin_columns_opt = values.bitcoin_columns_opt_all
+bitcoin_columns_opt = values.bitcoin_columns_opt_pro
 trend_columns_opt = [
     ['Trend']
 ]
@@ -148,7 +150,8 @@ total_models = len(combinations)
 print('Quantity of Models: %s' % str(total_models))
 model_count = 0
 
-path = 'C:/tmp/bitcoin/'
+#path = 'C:/tmp/bitcoin/'
+path = '../data/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 output_file = 'main_window_x_size_results2.csv'
 
