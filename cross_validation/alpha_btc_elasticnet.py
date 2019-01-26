@@ -9,7 +9,7 @@ from math import sqrt
 from sklearn.model_selection import KFold
 from Util import misc
 
-window_size = 5  # 15
+window_size = 4  # 15
 path = 'C:/tmp/bitcoin/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
@@ -43,7 +43,7 @@ x_train, y_train = train[:, 0:-1], train[:, -1]
 x_val, y_val = val[:, 0:-1], val[:, -1]
 x_test, y_test = test[:, 0:-1], test[:, -1]
 
-print('Alpha - Passangers')
+print('ElasticNet - Passangers')
 print('Size Train %i' % (len(train)))
 print('Size Val %i' % (len(val)))
 print('Size Test %i' % (len(test)))
@@ -61,7 +61,7 @@ rmse_val = []
 rmse_test = []
 
 print("Train VS Val")
-lasso = linear_model.Lasso(max_iter=1000000, normalize=True)
+lasso = linear_model.ElasticNet(max_iter=1000000, normalize=True)
 for a in alphas:
     lasso.set_params(alpha=a)
     lasso.fit(x_train, y_train)
@@ -75,7 +75,7 @@ print("Train + Val VS Test")
 x_train_val = np.concatenate((x_train, x_val), axis=0)
 y_train_val = np.concatenate((y_train, y_val), axis=0)
 
-lasso = linear_model.Lasso(max_iter=1000000, normalize=True)
+lasso = linear_model.ElasticNet(max_iter=1000000, normalize=True)
 for a in alphas:
     lasso.set_params(alpha=a)
     lasso.fit(x_train_val, y_train_val)
