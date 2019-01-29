@@ -11,7 +11,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsRegressor
 
 
-series = read_csv('../keras/shampoo-sales2.csv', header=0)
+series = read_csv('../tests/shampoo-sales2.csv', header=0)
 raw_values = series.values
 train, test = raw_values[0:40], raw_values[40:50]
 

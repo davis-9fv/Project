@@ -7,14 +7,14 @@ from pandas import read_csv
 from pandas import datetime
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-from keras.layers import LSTM
+from tests.models import Sequential
+from tests.layers import Dense, Activation
+from tests.layers import LSTM
 from math import sqrt
 from matplotlib import pyplot
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from keras.layers import Dropout
+from tests.layers import Dropout
 from sklearn.model_selection import train_test_split
 
 

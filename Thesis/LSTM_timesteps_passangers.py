@@ -4,14 +4,14 @@ from pandas import DataFrame
 from pandas import read_csv
 from sklearn.metrics import mean_squared_error
 from math import sqrt
-from keras.layers import Input
-from keras.models import Model
+from tests.layers import Input
+from tests.models import Model
 import numpy
 from Util import misc
 from Util import data_misc
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-from keras.layers import LSTM
+from tests.models import Sequential
+from tests.layers import Dense, Activation
+from tests.layers import LSTM
 
 
 def compare(y_test, y_predicted):

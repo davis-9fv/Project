@@ -43,7 +43,8 @@ x_train, y_train = train[:, 0:-1], train[:, -1]
 x_val, y_val = val[:, 0:-1], val[:, -1]
 x_test, y_test = test[:, 0:-1], test[:, -1]
 
-print('Alpha - Passangers')
+print('Alpha - BTC')
+print('Window Size %i' % (window_size))
 print('Size Train %i' % (len(train)))
 print('Size Val %i' % (len(val)))
 print('Size Test %i' % (len(test)))

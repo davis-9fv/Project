@@ -1,24 +1,30 @@
 from pandas import read_csv
 from Util import data_misc
-from sklearn import linear_model
-from sklearn.metrics import mean_squared_error
 import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
+from sklearn.neighbors import KNeighborsRegressor
 from math import sqrt
-from sklearn.model_selection import KFold
+from sklearn.metrics import mean_squared_error
 from Util import misc
 
-window_size = 10  # 15
-series = read_csv('../data/airline-passengers.csv', header=0, sep='\t')
+
+window_size = 5  # 15
+path = 'C:/tmp/bitcoin/'
+input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
+series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
+series = series.iloc[::-1]
+
 for i in range(0, 30):
-    corr = series['Passangers'].autocorr(lag=i)
+    corr = series['Avg'].autocorr(lag=i)
     print('Corr: %.2f Lang: %i' % (corr, i))
 
+avg = series['Avg']
+avg_values = avg.values
+# Stationary Data
+diff_values = data_misc.difference(avg_values, 1)
+avg_values = diff_values
+print("Diff values")
 
-
-raw_values = series['Passangers']
-supervised = data_misc.timeseries_to_supervised(raw_values, window_size)
+supervised = data_misc.timeseries_to_supervised(avg_values, window_size)
 # print(raw_values)
 supervised = supervised.values[window_size:, :]
 # supervised = list(range(1, 101))
@@ -35,33 +41,31 @@ x_train, y_train = train[:, 0:-1], train[:, -1]
 x_val, y_val = val[:, 0:-1], val[:, -1]
 x_test, y_test = test[:, 0:-1], test[:, -1]
 
-print('ElasticNet - Passangers')
+print('KNN - BTC')
 print('Window Size %i' % (window_size))
 print('Size Train %i' % (len(train)))
 print('Size Val %i' % (len(val)))
 print('Size Test %i' % (len(test)))
 
 print('Size supervised %i' % (size_supervised))
-print('Size raw_values %i' % (len(raw_values)))
+print('Size raw_values %i' % (len(avg_values)))
 
-alphas = np.arange(-300, 500, 3)
-# alphas = 100 ** np.linspace(6, -2, 500) * 0.5
-alphas = np.linspace(1, -0.5, 50)
-print(alphas)
-print("Total Alphas")
-print(len(alphas))
+n_neighbors = [1,2,3,4,5,6,7,8,9,10]
+print(n_neighbors)
+print("Total Neighbors")
+print(len(n_neighbors))
 
 coefs = []
 rmse_val = []
 rmse_test = []
 
 print("Train VS Val")
-lasso = linear_model.ElasticNet(max_iter=10000000, normalize=True)
-for a in alphas:
-    lasso.set_params(alpha=a)
-    lasso.fit(x_train, y_train)
-    coefs.append(lasso.coef_)
-    y_val_predicted = lasso.predict(x_val)
+neigh = KNeighborsRegressor(algorithm='kd_tree', leaf_size=30, weights='uniform', n_jobs=4)
+for a in n_neighbors:
+    neigh.set_params(n_neighbors=a)
+    neigh.fit(x_train, y_train)
+    #    coefs.append(neigh.coef_)
+    y_val_predicted = neigh.predict(x_val)
     rmse = sqrt(mean_squared_error(y_val, y_val_predicted))
     rmse_val.append(rmse)
     print('RMSE Lasso   %.3f    Alpha:  %.10f,' % (rmse, a))
@@ -70,12 +74,12 @@ print("Train + Val VS Test")
 x_train_val = np.concatenate((x_train, x_val), axis=0)
 y_train_val = np.concatenate((y_train, y_val), axis=0)
 
-lasso = linear_model.ElasticNet(max_iter=10000000, normalize=True)
-for a in alphas:
-    lasso.set_params(alpha=a)
-    lasso.fit(x_train_val, y_train_val)
-    coefs.append(lasso.coef_)
-    y_test_predicted = lasso.predict(x_test)
+neigh = KNeighborsRegressor(algorithm='kd_tree', leaf_size=30, weights='uniform', n_jobs=4)
+for a in n_neighbors:
+    neigh.set_params(n_neighbors=a)
+    neigh.fit(x_train_val, y_train_val)
+    #   coefs.append(neigh.coef_)
+    y_test_predicted = neigh.predict(x_test)
     rmse = sqrt(mean_squared_error(y_test, y_test_predicted))
     rmse_test.append(rmse)
     print('RMSE Lasso   %.3f    Alpha:  %.10f,' % (rmse, a))
@@ -83,9 +87,9 @@ for a in alphas:
 rmse_avg = np.add(rmse_val, rmse_test)
 rmse_avg = np.add(rmse_avg, 2)
 
-print("Best Alpha")
-best_alpha = alphas[rmse_avg.argmin()]
-print(best_alpha)
+print("Best Neighbor")
+best_neighbor = n_neighbors[rmse_avg.argmin()]
+print(best_neighbor)
 
 print("Best RMSE of Val")
 print(rmse_val[rmse_avg.argmin()])
@@ -99,4 +103,4 @@ print(rmse_avg.min())
 print("RMSE Index from Lowest Value")
 print(rmse_avg.argmin())
 
-misc.plot_cross_validation(alphas=alphas, best_alpha=best_alpha, rmse_val=rmse_val, rmse_test=rmse_test)
+misc.plot_cross_validation(alphas=n_neighbors, best_alpha=best_neighbor, rmse_val=rmse_val, rmse_test=rmse_test)

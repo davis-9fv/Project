@@ -9,7 +9,7 @@ from math import sqrt
 from sklearn.model_selection import KFold
 from Util import misc
 
-window_size = 4  # 15
+window_size = 5  # 15
 path = 'C:/tmp/bitcoin/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
@@ -43,7 +43,8 @@ x_train, y_train = train[:, 0:-1], train[:, -1]
 x_val, y_val = val[:, 0:-1], val[:, -1]
 x_test, y_test = test[:, 0:-1], test[:, -1]
 
-print('ElasticNet - Passangers')
+print('ElasticNet - BTC')
+print('Window Size %i' % (window_size))
 print('Size Train %i' % (len(train)))
 print('Size Val %i' % (len(val)))
 print('Size Test %i' % (len(test)))

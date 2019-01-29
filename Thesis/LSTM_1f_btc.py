@@ -3,9 +3,9 @@
 from pandas import DataFrame
 from pandas import read_csv
 from sklearn.metrics import mean_squared_error
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-from keras.layers import LSTM
+from tests.models import Sequential
+from tests.layers import Dense, Activation
+from tests.layers import LSTM
 from math import sqrt
 import numpy
 from Util import misc

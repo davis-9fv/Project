@@ -8,7 +8,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from math import sqrt
 
-series = read_csv('../keras/shampoo-sales3.csv', header=0)
+series = read_csv('../tests/shampoo-sales3.csv', header=0)
 raw_data = series.values
 X_train, X_test, y_train, y_test = train_test_split(raw_data[:, 0], raw_data[:, 1], test_size=0.33, random_state=9)
 

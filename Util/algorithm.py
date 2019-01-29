@@ -1,6 +1,5 @@
 from sklearn.linear_model import ElasticNet
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn import linear_model
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
@@ -78,7 +77,7 @@ def lasso(x_train, y_train, x_to_predict, normalize=False):
 
 
 def sgd_regressor(x_train, y_train, x_to_predict):
-    clf = linear_model.SGDRegressor(max_iter=2000, verbose=False, shuffle=False)
+    clf = linear_model.SGDRegressor(max_iter=2000, alpha=0, verbose=False, shuffle=False)
     clf.fit(x_train, y_train)
     y_predicted = clf.predict(x_to_predict)
     return y_predicted
