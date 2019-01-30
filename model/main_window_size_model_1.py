@@ -343,7 +343,7 @@ for combination in combinations:
     if use_LSTM:
         # rmse, y_predicted = 0, 0
         y_predicted_es = algorithm.lstm(x_train, y_train, x_train, batch_size=1, nb_epoch=150, neurons=10)
-        rmse, y_predicted = compare_train(len_y_test, y_predicted_es)
+        rmse, y_predicted = compare_train(len_y_train, y_predicted_es)
         lstm_train_results.append(rmse)
         corr_lstm_train_results.append(data_misc.correlation(y_train, y_predicted))
         print('RMSE LSTM    %.3f' % (rmse))
