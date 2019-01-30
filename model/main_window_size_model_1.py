@@ -10,6 +10,27 @@ from Util import data_misc
 import numpy as np
 import itertools
 from model import values
+from pandas import concat
+
+
+def diff_df(df_data):
+    processed_columns = []
+    for column_name in df_data:
+        values_column = df_data[column_name]
+        diff_col = data_misc.difference(values_column, 1)
+        tmp = []
+        for val in diff_col:
+            tmp.append(val)
+
+        processed_columns.append(tmp)
+
+    df_diff = DataFrame()
+    i = 0
+    for column in df_data:
+        df_diff[column] = processed_columns[i]
+        i = i + 1
+
+    return df_diff
 
 
 def compare_train(len_y_train=0, y_predicted=[]):
@@ -22,6 +43,7 @@ def compare_train(len_y_train=0, y_predicted=[]):
         yhat = data_misc.inverse_difference(d, yhat, len_y_train + 1 - i)
         predictions.append(yhat)
 
+    # the +1 represents the drop that we did when the data was diff
     d = avg_values[window_size + 1:split + window_size + 1]
     rmse = sqrt(mean_squared_error(d, predictions))
     return rmse, predictions
@@ -40,6 +62,7 @@ def compare(len_y_test=0, y_predicted=[]):
 
         predictions.append(yhat)
 
+    # the +1 represents the drop that we did when the data was diff
     d = avg_values[split + window_size + 1:]
     # d = avg_values[split + window_size :]
     rmse = sqrt(mean_squared_error(d, predictions))
@@ -106,14 +129,14 @@ write_file = True
 plot = False
 
 cross_validation_opt = [False]
-use_bitcoin_data_opt = [True, False]
-use_trend_column_opt = [True, False]
-#window_size_opt = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+use_bitcoin_data_opt = [True]
+use_trend_column_opt = [False]
+# window_size_opt = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
 # window_size_opt = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14]
-window_size_opt = [5,7]
+window_size_opt = [5]
 
 lag = [1]
-bitcoin_columns_opt = values.bitcoin_columns_opt_test
+bitcoin_columns_opt = values.bitcoin_columns_opt_2_col
 trend_columns_opt = [
     ['Trend']
 ]
@@ -223,10 +246,12 @@ for combination in combinations:
 
         bitcoin_values = df_bitcoin.values
         # We cut the first or last element to pair with the diff values.
-        # bitcoin_values = bitcoin_values[1:, :]
-        bitcoin_values = bitcoin_values[:-1, :]
-        # We cut from the beginning to pair with the supervised values.
-        bitcoin_values = bitcoin_values[:-window_size, :]
+        bitcoin_values = bitcoin_values[1:, :]
+        # bitcoin_values = bitcoin_values[:-1, :]
+        # We cut from the bottom to pair with the supervised values. This will pair with the last day.
+        # bitcoin_values = bitcoin_values[:-window_size, :]
+        # We cut from the end and the bottom to pair with the supervised values. This will pair with the current day.
+        bitcoin_values = bitcoin_values[window_size - 1:-1, :]
         # Concatenate with numpy
         supervised = np.concatenate((bitcoin_values, supervised), axis=1)
 
@@ -239,10 +264,12 @@ for combination in combinations:
 
         trend_values = df_trend.values
         # We cut the first or last element to pair with the diff values.
-        # bitcoin_values = bitcoin_values[1:, :]
-        trend_values = trend_values[:-1, :]
-        # We cut from the beginning to pair with the supervised values.
-        trend_values = trend_values[:-window_size, :]
+        bitcoin_values = bitcoin_values[1:, :]
+        # trend_values = trend_values[:-1, :]
+        # We cut from the bottom to pair with the supervised values. This will pair with the last day.
+        # trend_values = trend_values[:-window_size, :]
+        # We cut from the end and the bottom to pair with the supervised values. This will pair with the current day.
+        trend_values = trend_values[window_size - 1:-1, :]
         # Concatenate with numpy
         supervised = np.concatenate((trend_values, supervised), axis=1)
 
@@ -314,10 +341,17 @@ for combination in combinations:
         print('RMSE SGD     %.3f' % (rmse))
 
     if use_LSTM:
-        rmse, y_predicted = 0, 0
+        # rmse, y_predicted = 0, 0
+        y_predicted_es = algorithm.lstm(x_train, y_train, x_train, batch_size=1, nb_epoch=150, neurons=10)
+        rmse, y_predicted = compare_train(len_y_test, y_predicted_es)
         lstm_train_results.append(rmse)
         corr_lstm_train_results.append(data_misc.correlation(y_train, y_predicted))
         print('RMSE LSTM    %.3f' % (rmse))
+
+        #rmse, y_predicted = 0, 0
+        #lstm_train_results.append(rmse)
+        #corr_lstm_train_results.append(data_misc.correlation(y_train, y_predicted))
+        #print('RMSE LSTM    %.3f' % (rmse))
 
     print(':: Test ::')
     len_y_test = len(y_test)
@@ -373,9 +407,11 @@ for combination in combinations:
         print('RMSE SGD     %.3f' % (rmse))
 
     if use_LSTM:
-        rmse, y_predicted = 0, 0
+        # rmse, y_predicted = 0, 0
+        y_predicted_es = algorithm.lstm(x_train, y_train, x_test, batch_size=1, nb_epoch=150, neurons=10)
+        rmse, y_predicted_lstm = compare(len_y_test, y_predicted_es)
         lstm_test_results.append(rmse)
-        corr_lstm_test_results.append(data_misc.correlation(y_test, y_predicted))
+        corr_lstm_test_results.append(data_misc.correlation(y_test, y_predicted_lstm))
         print('RMSE LSTM    %.3f' % (rmse))
 
     print('----------')

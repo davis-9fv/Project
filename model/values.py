@@ -3,6 +3,14 @@ bitcoin_columns_opt_test = [
     ['year', 'generation']
 ]
 
+bitcoin_columns_opt_1_col = [
+    ['year']
+]
+
+bitcoin_columns_opt_2_col = [
+    ['input_count','size']
+]
+
 bitcoin_columns_opt_all = [
     # All features
     ['Open', 'High', 'Low', 'Close', 'day_of_week', 'day_of_month', 'day_of_year', 'month_of_year', 'year',

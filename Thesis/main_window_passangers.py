@@ -27,7 +27,7 @@ date = date.values
 
 raw_values = series.values
 raw_values = data_misc.timeseries_to_supervised(raw_values, window_size)
-# print(raw_values)
+print(raw_values)
 raw_values = raw_values.values[window_size:, :]
 
 size_raw_values = len(raw_values)

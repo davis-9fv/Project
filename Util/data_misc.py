@@ -46,8 +46,10 @@ def invert_scale_array(scaler, X, values):
 
 # create a differenced series
 # Trabaja perfectamente, se come el primer valor de la data
-def difference(dataset, interval=1):
+def difference(dataset, interval=1, include_first_item = False):
     diff = list()
+    if include_first_item:
+        diff.append(0)
     for i in range(interval, len(dataset)):
         num1 = dataset[i]
         num2 = dataset[i - interval]

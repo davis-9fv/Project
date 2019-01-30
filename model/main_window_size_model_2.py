@@ -112,7 +112,7 @@ def get_combinations(comb):
                         purged_comb[use_bitcoin_columns_index] = False
                         purged_comb[bitcoin_columns_index] = [""]
                     else:
-                        save = True
+                        save = False
 
                 if not use_trend_columns:
                     purged_comb[window_size_trend_index] = 0
@@ -143,7 +143,7 @@ window_size_btc_opt = [2,3]
 window_size_trend_opt = [4,3]
 
 lag = [1]
-bitcoin_columns_opt = values.bitcoin_columns_opt_2_col
+bitcoin_columns_opt = values.bitcoin_columns_opt_test
 trend_columns_opt = [
     ['Trend']
 ]
