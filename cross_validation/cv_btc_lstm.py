@@ -3,9 +3,6 @@ from Util import data_misc
 from sklearn.metrics import mean_squared_error
 import numpy as np
 from math import sqrt
-from Util import misc
-from sklearn.preprocessing import StandardScaler
-from sklearn import linear_model
 from sklearn.preprocessing import MinMaxScaler
 import itertools
 from keras.models import Sequential
@@ -62,6 +59,7 @@ def experiment(neurons, epochs, alpha, n_repeats):
     for r in range(n_repeats):
         np.random.seed(r)
         print(":: Repeat %i/%i" % (r + 1, n_repeats))
+        print('L1: %s   L2: %s' % (alpha[0], alpha[1]))
         print("Train VS Val")
         y_val_predicted, lstm_model = lstm(x_train, y_train, x_val,
                                            neurons=neurons,
@@ -70,7 +68,7 @@ def experiment(neurons, epochs, alpha, n_repeats):
                                            l1l2=alpha)
         rmse = sqrt(mean_squared_error(y_val, y_val_predicted))
         rmse_val.append(rmse)
-        print('RMSE LSTM   %.3f    L1L2:  %s,' % (rmse, alpha))
+        print('     RMSE LSTM   %.3f' % (rmse))
 
         print("Train + Val VS Test")
         x_train_val = np.concatenate((x_train, x_val), axis=0)
@@ -83,7 +81,7 @@ def experiment(neurons, epochs, alpha, n_repeats):
                                             l1l2=alpha)
         rmse = sqrt(mean_squared_error(y_test, y_test_predicted))
         rmse_test.append(rmse)
-        print('RMSE LSTM   %.3f    L1L2:  %s,' % (rmse, alpha))
+        print('     RMSE LSTM   %.3f' % (rmse))
 
     rmse_total = np.add(rmse_val, rmse_test)
     rmse_total = np.divide(rmse_total, 2)
@@ -97,8 +95,8 @@ def experiment(neurons, epochs, alpha, n_repeats):
 
 
 window_size = 5  # 15
-path = '/code/Project/data/'
-#path = 'C:/tmp/bitcoin/'
+#path = '/code/Project/data/'
+path = 'C:/tmp/bitcoin/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 output_file = 'cv_btc_lstm_results.csv'
 series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
