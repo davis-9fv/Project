@@ -10,7 +10,7 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.regularizers import L1L2
 from pandas import DataFrame
-
+import datetime
 
 # https://machinelearningmastery.com/use-weight-regularization-lstm-networks-time-series-forecasting/
 
@@ -55,11 +55,10 @@ def experiment(neurons, epochs, alpha, n_repeats):
     rmse_test = []
     result = []
     print("----")
-    print("Neurons: %i      Epochs: %i      NRepeats: %i" % (neurons, epochs, n_repeats))
+    print("Neurons: %i      Epochs: %i      NRepetitions: %i" % (neurons, epochs, n_repeats))
     for r in range(n_repeats):
         np.random.seed(r)
-        print(":: Repeat %i/%i" % (r + 1, n_repeats))
-        print('L1: %s   L2: %s' % (alpha[0], alpha[1]))
+        print(":: Repetition %i/%i      L1: %s   L2: %s" % (r + 1, n_repeats, alpha[0], alpha[1]))
         print("Train VS Val")
         y_val_predicted, lstm_model = lstm(x_train, y_train, x_val,
                                            neurons=neurons,
@@ -94,9 +93,12 @@ def experiment(neurons, epochs, alpha, n_repeats):
     return [rmse_val_avg, rmse_test_avg, rmse_total_avg, neurons, epochs, alpha[0], alpha[1], n_repeats]
 
 
+time_start = datetime.datetime.now()
+print('Start time: %s' % str(time_start.strftime('%Y-%m-%d %H:%M:%S')))
+
 window_size = 5  # 15
-#path = '/code/Project/data/'
-path = 'C:/tmp/bitcoin/'
+path = '/code/Project/data/'
+#path = 'C:/tmp/bitcoin/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 output_file = 'cv_btc_lstm_results.csv'
 series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
@@ -148,25 +150,25 @@ print('Size Test %i' % (len(test)))
 print('Size supervised %i' % (size_supervised))
 print('Size raw_values %i' % (len(avg_values)))
 
-l1 = np.linspace(3, -3, 1)
+l1 = np.linspace(3, -3, 10)
 l1_ = []
 for val in l1:
     l1_.append(val)
 
 l1_.append(0)
 
-l2 = np.linspace(3, -3, 1)
+l2 = np.linspace(3, -3, 10)
 l2_ = []
 for val in l2:
     l2_.append(val)
 
 l2_.append(0)
 
-neurons_list = [1]
-epochs_list = [1]
+neurons_list = [4, 5, 6, 7, 8]
+epochs_list = [100, 150, 200]
 alphas_list = [l1_, l2_]
 alphas_list = list(itertools.product(*alphas_list))
-n_repeats = 3
+n_repeats = 10
 
 print(alphas_list)
 print("Total Alphas")
@@ -181,6 +183,7 @@ print("Configuration:::")
 print("neurons_list:    %s" % (neurons_list))
 print("epochs_list:     %s" % (epochs_list))
 print("alphas_list:     %s" % (alphas_list))
+print("n_repeats:       %s" % (n_repeats))
 
 for neurons in neurons_list:
     print("\n\n")
@@ -220,3 +223,7 @@ columns = ['rmse_val_avg', 'rmse_test_avg', 'rmse_total_avg', 'neurons', 'epochs
            'alpha[1]', 'n_repeats']
 df_results = DataFrame(overal_result, columns=columns)
 df_results.to_csv(path + output_file, header=True)
+
+time_end = datetime.datetime.now()
+print('End time: %s' % str(time_end.strftime('%Y-%m-%d %H:%M:%S')))
+print('Duration of the script: %s' % (str(time_end - time_start)))
