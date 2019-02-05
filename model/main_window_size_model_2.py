@@ -1,11 +1,9 @@
-from sklearn.utils import shuffle
 import datetime
-from Util import algorithm
+from Util import algorithms
 from pandas import DataFrame
 from pandas import read_csv
 from sklearn.metrics import mean_squared_error
 from math import sqrt
-from Util import misc
 from Util import data_misc
 import numpy as np
 import itertools
@@ -49,7 +47,7 @@ def compare_train(len_y_train=0, y_predicted=[]):
     return rmse, predictions
 
 
-def compare(len_y_test=0, y_predicted=[]):
+def compare_test(len_y_test=0, y_predicted=[]):
     predictions = list()
     for i in range(len_y_test):
         X = x_test[i]
@@ -81,7 +79,7 @@ def get_combinations(comb):
                 use_bitcoin_columns = combination[use_bitcoin_columns_index]
                 use_trend_columns = combination[use_trend_columns_index]
                 save = True
-                purged_comb = ["", "", "", "", "", "","",""]
+                purged_comb = ["", "", "", "", "", "", "", ""]
                 purged_comb[window_size_avg_index] = combination[window_size_avg_index]
                 purged_comb[window_size_btc_index] = combination[window_size_btc_index]
                 purged_comb[window_size_trend_index] = combination[window_size_trend_index]
@@ -134,13 +132,13 @@ write_file = True
 plot = False
 
 cross_validation_opt = [False]
-use_bitcoin_data_opt = [True,False]
-use_trend_column_opt = [True,False]
-#window_size_opt = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-#indow_size_opt = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14]
-window_size_avg_opt = [5,7]
-window_size_btc_opt = [2,3]
-window_size_trend_opt = [4,3]
+use_bitcoin_data_opt = [ True]
+use_trend_column_opt = [False]
+# window_size_opt = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+# indow_size_opt = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14]
+window_size_avg_opt = [3]
+window_size_btc_opt = [3]
+window_size_trend_opt = [3]
 
 lag = [1]
 bitcoin_columns_opt = values.bitcoin_columns_opt_test
@@ -192,8 +190,8 @@ corr_sgd_test_results = []
 corr_lstm_test_results = []
 
 window_size_avg_index = 0
-window_size_btc_index=1
-window_size_trend_index=2
+window_size_btc_index = 1
+window_size_trend_index = 2
 lag_index = 3
 use_bitcoin_columns_index = 4
 bitcoin_columns_index = 5
@@ -215,7 +213,7 @@ print('Quantity of Models: %s' % str(total_models))
 model_count = 0
 
 path = 'C:/tmp/bitcoin/'
-# path = '/home/fran_vinueza/'
+# path = '/code/Project/data/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 output_file = 'main_window_x_size_model_2.csv'
 
@@ -224,7 +222,14 @@ series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
 series = series.iloc[::-1]
 avg = series['Avg']
 avg_values = avg.values
-#avg_values = [10, 22, 30, 42, 50, 62, 70, 82, 90, 102]
+# avg_values = [10, 22, 30, 42, 50, 62, 70, 82, 90, 102]
+
+elasticnet_model = None
+lasso_model = None
+knn5_model = None
+knn10_model = None
+sgd_model = None
+lstm_model = None
 
 for combination in combinations:
     model_count = model_count + 1
@@ -241,7 +246,7 @@ for combination in combinations:
     # We pair the avg_supervised column with the weight_supervised
     cut_beginning = [window_size_avg]
     if use_bitcoin_columns and use_trend_columns:
-        cut_beginning = [window_size_avg, window_size_btc,window_size_trend]
+        cut_beginning = [window_size_avg, window_size_btc, window_size_trend]
     if use_bitcoin_columns and not use_trend_columns:
         cut_beginning = [window_size_avg, window_size_btc]
     if not use_bitcoin_columns and use_trend_columns:
@@ -275,24 +280,21 @@ for combination in combinations:
         for column in bitcoin_columns:
             df_bitcoin[column] = series[column]
 
-        #bitcoin_values = df_bitcoin.values
-        #bitcoin_values = [110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
+        # bitcoin_values = df_bitcoin.values
+        # bitcoin_values = [110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
 
-        #btc = [110, 123, 130, 143, 150, 163, 170, 183, 190, 203]
-        #trend = [212, 224, 232, 244, 252, 264, 272, 284, 292, 304]
+        # btc = [110, 123, 130, 143, 150, 163, 170, 183, 190, 203]
+        # trend = [212, 224, 232, 244, 252, 264, 272, 284, 292, 304]
 
-        #df_bitcoin = DataFrame({'btc': btc,'trend': trend})
+        # df_bitcoin = DataFrame({'btc': btc,'trend': trend})
 
-        btc_supervised = supervised_diff_dt(df_bitcoin,window_size_btc)
+        btc_supervised = supervised_diff_dt(df_bitcoin, window_size_btc)
 
         # we cut according to the biggest window size
         btc_supervised = btc_supervised[total_window_size:, :]
 
         # Concatenate with numpy
         supervised = np.concatenate((btc_supervised, supervised), axis=1)
-
-
-
 
     print('Use Trend Columns:   %s' % str(use_trend_columns))
     if use_trend_columns:
@@ -309,56 +311,6 @@ for combination in combinations:
         # Concatenate with numpy
         supervised = np.concatenate((trend_supervised, supervised), axis=1)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     # Supervised reffers either avg_supervised or the combination of avg_supervised with bitcoin_values.
     size_supervised = len(supervised)
     split = int(size_supervised * 0.80)
@@ -368,6 +320,8 @@ for combination in combinations:
     x_train, y_train = train_scaled[:, 0:-1], train_scaled[:, -1]
     x_test, y_test = test_scaled[:, 0:-1], test_scaled[:, -1]
 
+    total_features = len(train[0])
+    print('Total Features: %i' % (total_features))
     print('Total of supervised data: %i' % (size_supervised))
 
     print(':: Train ::')
@@ -389,14 +343,14 @@ for combination in combinations:
 
     # ElasticNet
     if use_ElasticNet:
-        y_predicted_es = algorithm.elastic_net2(x_train, y_train, x_train, normalize=False)
+        y_predicted_es, elasticnet_model = algorithms.elastic_net(x_train, y_train, x_train, normalize=False)
         rmse, y_predicted = compare_train(len_y_train, y_predicted_es)
         elastic_train_results.append(rmse)
         corr_elastic_train_results.append(data_misc.correlation(y_train, y_predicted))
         print('RMSE Elastic %.3f' % (rmse))
 
     if use_LASSO:
-        y_predicted_es = algorithm.lasso(x_train, y_train, x_train, normalize=False)
+        y_predicted_es, lasso_model = algorithms.lasso(x_train, y_train, x_train, normalize=False)
         rmse, y_predicted = compare_train(len_y_train, y_predicted_es)
         lasso_train_results.append(rmse)
         corr_lasso_train_results.append(data_misc.correlation(y_train, y_predicted))
@@ -404,7 +358,7 @@ for combination in combinations:
 
     # KNN5
     if use_KNN5:
-        y_predicted_es = algorithm.knn_regressor(x_train, y_train, x_train, 5)
+        y_predicted_es, knn5_model = algorithms.knn_regressor(x_train, y_train, x_train, 5)
         rmse, y_predicted = compare_train(len_y_train, y_predicted_es)
         knn5_train_results.append(rmse)
         corr_knn5_train_results.append(data_misc.correlation(y_train, y_predicted))
@@ -412,7 +366,7 @@ for combination in combinations:
 
     # KNN10
     if use_KNN10:
-        y_hat_predicted = algorithm.knn_regressor(x_train, y_train, x_train, 10)
+        y_hat_predicted, knn10_model = algorithms.knn_regressor(x_train, y_train, x_train, 10)
         rmse, y_predicted = compare_train(len_y_train, y_hat_predicted)
         knn10_train_results.append(rmse)
         corr_knn10_train_results.append(data_misc.correlation(y_train, y_predicted))
@@ -420,17 +374,27 @@ for combination in combinations:
 
     # SGD
     if use_SGD:
-        y_predicted_es = algorithm.sgd_regressor(x_train, y_train, x_train)
+        y_predicted_es, sgd_model = algorithms.sgd_regressor(x_train, y_train, x_train)
         rmse, y_predicted = compare_train(len_y_train, y_predicted_es)
         sgd_train_results.append(rmse)
         corr_sgd_train_results.append(data_misc.correlation(y_train, y_predicted))
         print('RMSE SGD     %.3f' % (rmse))
 
     if use_LSTM:
-        rmse, y_predicted = 0, 0
+        # rmse, y_predicted = 0, 0
+        nb_epoch = 1
+        neurons = total_features
+        print("Epoch: %i  Neurons: %i" % (nb_epoch, neurons))
+        y_predicted_es, lstm_model = algorithms.lstm(x_train, y_train, x_train, batch_size=1, nb_epoch=nb_epoch,
+                                                     neurons=neurons)
+        rmse, y_predicted = compare_train(len_y_train, y_predicted_es)
         lstm_train_results.append(rmse)
         corr_lstm_train_results.append(data_misc.correlation(y_train, y_predicted))
         print('RMSE LSTM    %.3f' % (rmse))
+
+        # lstm_train_results.append(rmse)
+        # corr_lstm_train_results.append(data_misc.correlation(y_train, y_predicted))
+        # print('RMSE LSTM    %.3f' % (rmse))
 
     print(':: Test ::')
     len_y_test = len(y_test)
@@ -438,57 +402,59 @@ for combination in combinations:
     # No Prediction
 
     y_predicted_normal_es = y_test
-    rmse, y_predicted_normal = compare(len_y_test, y_predicted_normal_es)
+    rmse, y_predicted_normal = compare_test(len_y_test, y_predicted_normal_es)
     normal_test_results.append(rmse)
     corr_normal_test_results.append(data_misc.correlation(y_test, y_predicted_normal))
     print('RMSE NoPredic  %.3f' % (rmse))
 
     if use_Dummy:
         y_predicted_es = x_test[:, -1]
-        rmse, y_predicted_dummy = compare(len_y_test, y_predicted_es)
+        rmse, y_predicted_dummy = compare_test(len_y_test, y_predicted_es)
         dummy_test_results.append(rmse)
         corr_dummy_test_results.append(data_misc.correlation(y_test, y_predicted_dummy))
         print('RMSE Dummy   %.3f' % (rmse))
 
     if use_ElasticNet:
-        y_predicted_es = algorithm.elastic_net2(x_train, y_train, x_test, normalize=False)
-        rmse, y_predicted_en = compare(len_y_test, y_predicted_es)
+        y_predicted_es = elasticnet_model.predict(x_test)
+        rmse, y_predicted_en = compare_test(len_y_test, y_predicted_es)
         elastic_test_results.append(rmse)
         corr_elastic_test_results.append(data_misc.correlation(y_test, y_predicted_en))
         print('RMSE Elastic %.3f' % (rmse))
 
     if use_LASSO:
-        y_predicted_es = algorithm.lasso(x_train, y_train, x_test, normalize=False)
-        rmse, y_predicted_la = compare(len_y_test, y_predicted_es)
+        y_predicted_es = lasso_model.predict(x_test)
+        rmse, y_predicted_la = compare_test(len_y_test, y_predicted_es)
         lasso_test_results.append(rmse)
         corr_lasso_test_results.append(data_misc.correlation(y_test, y_predicted_la))
         print('RMSE Lasso   %.3f' % (rmse))
 
     if use_KNN5:
-        y_predicted_es = algorithm.knn_regressor(x_train, y_train, x_test, 5)
-        rmse, y_predicted_knn5 = compare(len_y_test, y_predicted_es)
+        y_predicted_es = knn5_model.predict(x_test)
+        rmse, y_predicted_knn5 = compare_test(len_y_test, y_predicted_es)
         knn5_test_results.append(rmse)
         corr_knn5_test_results.append(data_misc.correlation(y_test, y_predicted_knn5))
         print('RMSE KNN(5)  %.3f' % (rmse))
 
     if use_KNN10:
-        y_predicted_es = algorithm.knn_regressor(x_train, y_train, x_test, 10)
-        rmse, y_predicted_knn10 = compare(len_y_test, y_predicted_es)
+        y_predicted_es = knn10_model.predict(x_test)
+        rmse, y_predicted_knn10 = compare_test(len_y_test, y_predicted_es)
         knn10_test_results.append(rmse)
         corr_knn10_test_results.append(data_misc.correlation(y_test, y_predicted_knn10))
         print('RMSE KNN(10) %.3f' % (rmse))
 
     if use_SGD:
-        y_predicted_es = algorithm.sgd_regressor(x_train, y_train, x_test)
-        rmse, y_predicted_sgd = compare(len_y_test, y_predicted_es)
+        y_predicted_es = sgd_model.predict(x_test)
+        rmse, y_predicted_sgd = compare_test(len_y_test, y_predicted_es)
         sgd_test_results.append(rmse)
         corr_sgd_test_results.append(data_misc.correlation(y_test, y_predicted_sgd))
         print('RMSE SGD     %.3f' % (rmse))
 
     if use_LSTM:
-        rmse, y_predicted = 0, 0
+        # rmse, y_predicted = 0, 0
+        y_predicted_es = algorithms.lstm_predict(lstm_model, x_test, batch_size=1)
+        rmse, y_predicted_lstm = compare_test(len_y_test, y_predicted_es)
         lstm_test_results.append(rmse)
-        corr_lstm_test_results.append(data_misc.correlation(y_test, y_predicted))
+        corr_lstm_test_results.append(data_misc.correlation(y_test, y_predicted_lstm))
         print('RMSE LSTM    %.3f' % (rmse))
 
     print('----------')

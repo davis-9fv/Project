@@ -8,31 +8,34 @@ from Util import data_misc
 import numpy as np
 import itertools
 from model import values
+from pandas import RangeIndex
 
 
-def diff_df(df_data):
+def supervised_diff_dt(df_data, window_size):
     processed_columns = []
     for column_name in df_data:
         values_column = df_data[column_name]
         diff_col = data_misc.difference(values_column, 1)
-        tmp = []
-        for val in diff_col:
-            tmp.append(val)
+        supervised_col = data_misc.timeseries_to_supervised(diff_col, window_size)
+        # We drop the last column from weight_supervised because it is not the target we want
+        supervised_col = supervised_col.values[:, :-1]
+        processed_columns.append(supervised_col)
 
-        processed_columns.append(tmp)
+    flag = True
+    result = []
+    for col in processed_columns:
+        if flag:
+            result = col
+            flag = False
+        else:
+            result = np.concatenate((result, col), axis=1)
 
-    df_diff = DataFrame()
-    i = 0
-    for column in df_data:
-        df_diff[column] = processed_columns[i]
-        i = i + 1
-
-    return df_diff
+    return result
 
 
 def compare_train(len_y_train=0, y_predicted=[]):
     predictions = list()
-    d = avg_values[window_size:split + window_size + 1]
+    d = avg_values[total_window_size:split + total_window_size + 1]
     for i in range(len_y_train):
         X = x_train[i]
         yhat = y_predicted[i]
@@ -40,8 +43,7 @@ def compare_train(len_y_train=0, y_predicted=[]):
         yhat = data_misc.inverse_difference(d, yhat, len_y_train + 1 - i)
         predictions.append(yhat)
 
-    # the +1 represents the drop that we did when the data was diff
-    d = avg_values[window_size + 1:split + window_size + 1]
+    d = avg_values[total_window_size + 1:split + total_window_size + 1]
     rmse = sqrt(mean_squared_error(d, predictions))
     return rmse, predictions
 
@@ -54,13 +56,12 @@ def compare_test(len_y_test=0, y_predicted=[]):
         yhat = data_misc.invert_scale(scaler, X, yhat)
 
         # Stationary
-        d = avg_values[split + window_size - 1:]
+        d = avg_values[split + total_window_size - 1:]
         yhat = data_misc.inverse_difference(d, yhat, len_y_test + 1 - i)
 
         predictions.append(yhat)
 
-    # the +1 represents the drop that we did when the data was diff
-    d = avg_values[split + window_size + 1:]
+    d = avg_values[split + total_window_size + 1:]
     # d = avg_values[split + window_size :]
     rmse = sqrt(mean_squared_error(d, predictions))
     # rmse = sqrt(mean_squared_error(y_test, y_predicted))
@@ -70,17 +71,19 @@ def compare_test(len_y_test=0, y_predicted=[]):
 def get_combinations(comb):
     comb = list(itertools.product(*comb))
     purged_combinations = []
-    for win_size in window_size_opt:
+    for win_size in window_size_avg_opt:
         flag_false_bit_false_trend = True
         flag_false_bit_true_trend = True
         flag_true_bit_false_trend = True
         for combination in comb:
-            if win_size == combination[window_size_index]:
+            if win_size == combination[window_size_avg_index]:
                 use_bitcoin_columns = combination[use_bitcoin_columns_index]
                 use_trend_columns = combination[use_trend_columns_index]
                 save = True
-                purged_comb = ["", "", "", "", "", ""]
-                purged_comb[window_size_index] = combination[window_size_index]
+                purged_comb = ["", "", "", "", "", "", "", ""]
+                purged_comb[window_size_avg_index] = combination[window_size_avg_index]
+                purged_comb[window_size_btc_index] = combination[window_size_btc_index]
+                purged_comb[window_size_trend_index] = combination[window_size_trend_index]
                 purged_comb[lag_index] = combination[lag_index]
 
                 purged_comb[use_bitcoin_columns_index] = combination[use_bitcoin_columns_index]
@@ -91,8 +94,10 @@ def get_combinations(comb):
 
                 if not use_bitcoin_columns and not use_trend_columns:
                     if flag_false_bit_false_trend:
+                        purged_comb[window_size_btc_index] = 0
                         purged_comb[use_bitcoin_columns_index] = False
                         purged_comb[bitcoin_columns_index] = [""]
+                        purged_comb[window_size_trend_index] = 0
                         purged_comb[use_trend_columns_index] = False
                         purged_comb[trend_column_index] = [""]
                         flag_false_bit_false_trend = False
@@ -102,12 +107,14 @@ def get_combinations(comb):
                 if not use_bitcoin_columns and use_trend_columns:
                     if flag_false_bit_true_trend:
                         flag_false_bit_true_trend = False
+                        purged_comb[window_size_btc_index] = 0
                         purged_comb[use_bitcoin_columns_index] = False
                         purged_comb[bitcoin_columns_index] = [""]
                     else:
                         save = False
 
                 if not use_trend_columns:
+                    purged_comb[window_size_trend_index] = 0
                     purged_comb[trend_column_index] = [""]
 
                 if save:
@@ -126,14 +133,16 @@ write_file = True
 plot = False
 
 cross_validation_opt = [False]
-use_bitcoin_data_opt = [False]
+use_bitcoin_data_opt = [True]
 use_trend_column_opt = [False]
 # window_size_opt = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-# window_size_opt = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14]
-window_size_opt = [5]
+# indow_size_opt = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14]
+window_size_avg_opt = [3]
+window_size_btc_opt = [3]
+window_size_trend_opt = [3]
 
 lag = [1]
-bitcoin_columns_opt = values.bitcoin_columns_opt_2_col
+bitcoin_columns_opt = values.bitcoin_columns_opt_test
 trend_columns_opt = [
     ['Trend']
 ]
@@ -181,14 +190,18 @@ corr_knn10_test_results = []
 corr_sgd_test_results = []
 corr_lstm_test_results = []
 
-window_size_index = 0
-lag_index = 1
-use_bitcoin_columns_index = 2
-bitcoin_columns_index = 3
-use_trend_columns_index = 4
-trend_column_index = 5
+window_size_avg_index = 0
+window_size_btc_index = 1
+window_size_trend_index = 2
+lag_index = 3
+use_bitcoin_columns_index = 4
+bitcoin_columns_index = 5
+use_trend_columns_index = 6
+trend_column_index = 7
 
-combinations = [window_size_opt,
+combinations = [window_size_avg_opt,
+                window_size_btc_opt,
+                window_size_trend_opt,
                 lag,
                 use_bitcoin_data_opt,
                 bitcoin_columns_opt,
@@ -203,13 +216,42 @@ model_count = 0
 path = 'C:/tmp/bitcoin/'
 # path = '/code/Project/data/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
-output_file = 'main_window_x_size_model_1.csv'
+output_file = 'main_window_x_size_model_2.csv'
 
 # To pair with the other models, this model gets 1438 first rows.
-series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
+series = read_csv(path + input_file, header=0, sep=',')
 series = series.iloc[::-1]
+
+# The index is ordered in ascending mode
+series.index = RangeIndex(len(series.index))
+
+# We drop index which contains 29/02/
+index_to_drop = series.loc[series['Date'] == '2016-02-29'].index.values.astype(int)[0]
+series = series.drop(series.index[index_to_drop])
+
+# The index is ordered again due to the a index was dropped
+series.index = RangeIndex(len(series.index))
+#print(series.head)
+
 avg = series['Avg']
-avg_values = avg.values
+# avg_values = [10, 22, 30, 42, 50, 62, 70, 82, 90, 102]
+
+lag_year = 365
+avg_values, avg_previous = data_misc.slide_data(avg.values, lag_year)
+date, date_previous = data_misc.slide_data(series['Date'].values, lag_year)
+series = series.iloc[lag_year:]
+# The index is ordered again due to the first rows were dropped
+series.index = RangeIndex(len(series.index))
+
+#print(series.head)
+#print(avg_values[0:4])
+
+df = DataFrame({'avg_previous': avg_previous })
+
+#print(df.head(10))
+
+
+
 
 elasticnet_model = None
 lasso_model = None
@@ -220,12 +262,26 @@ lstm_model = None
 
 for combination in combinations:
     model_count = model_count + 1
-    window_size = combination[window_size_index]
+    window_size_avg = combination[window_size_avg_index]
+    window_size_btc = combination[window_size_btc_index]
+    window_size_trend = combination[window_size_trend_index]
+
     lag = combination[lag_index]
     use_bitcoin_columns = combination[use_bitcoin_columns_index]
     bitcoin_columns = combination[bitcoin_columns_index]
     use_trend_columns = combination[use_trend_columns_index]
     trend_columns = combination[trend_column_index]
+
+    # We pair the avg_supervised column with the weight_supervised
+    cut_beginning = [window_size_avg]
+    if use_bitcoin_columns and use_trend_columns:
+        cut_beginning = [window_size_avg, window_size_btc, window_size_trend]
+    if use_bitcoin_columns and not use_trend_columns:
+        cut_beginning = [window_size_avg, window_size_btc]
+    if not use_bitcoin_columns and use_trend_columns:
+        cut_beginning = [window_size_avg, window_size_trend]
+
+    total_window_size = max(cut_beginning)
 
     print('----------')
     print(combination)
@@ -234,12 +290,25 @@ for combination in combinations:
     # Stationary Data
     # Difference only works for one step. Please implement for other steps
     avg_diff_values = data_misc.difference(avg_values, lag)
+
     # Avg values converted into supervised model
-    avg_supervised = data_misc.timeseries_to_supervised(avg_diff_values, window_size)
-    # The first [Window size number] contains zeros which need to be cut.
-    avg_supervised = avg_supervised.values[window_size:, :]
-    supervised = avg_supervised
-    print('Window Size:         %s' % str(window_size))
+    avg_supervised = data_misc.timeseries_to_supervised(avg_diff_values, window_size_avg)
+    # avg_supervised = data_misc.timeseries_to_supervised(avg_values, window_size_avg)
+
+    supervised = avg_supervised.values
+
+    # we cut according to the biggest window size
+    supervised = supervised[total_window_size:, :]
+
+    # For the previous year we make it supervised and diff.
+    avg_previous = supervised_diff_dt(df, window_size_avg)
+
+    # we cut according to the biggest window size
+    avg_previous = avg_previous[total_window_size:, :]
+    # Concatenate with numpy
+    supervised = np.concatenate((avg_previous, supervised), axis=1)
+
+    print('Window Size:         %s' % str(window_size_avg))
     print('Lag:                 %s' % str(lag))
     print('Use Bitcoin Columns: %s' % str(use_bitcoin_columns))
     if use_bitcoin_columns:
@@ -248,16 +317,20 @@ for combination in combinations:
         for column in bitcoin_columns:
             df_bitcoin[column] = series[column]
 
-        bitcoin_values = df_bitcoin.values
-        # We cut the first or last element to pair with the diff values.
-        bitcoin_values = bitcoin_values[1:, :]
-        # bitcoin_values = bitcoin_values[:-1, :]
-        # We cut from the bottom to pair with the supervised values. This will pair with the last day.
-        # bitcoin_values = bitcoin_values[:-window_size, :]
-        # We cut from the end and the bottom to pair with the supervised values. This will pair with the current day.
-        bitcoin_values = bitcoin_values[window_size - 1:-1, :]
+        # bitcoin_values = df_bitcoin.values
+        # bitcoin_values = [110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
+
+        # btc = [110, 123, 130, 143, 150, 163, 170, 183, 190, 203]
+        # trend = [212, 224, 232, 244, 252, 264, 272, 284, 292, 304]
+
+        # df_bitcoin = DataFrame({'btc': btc,'trend': trend})
+        btc_supervised = supervised_diff_dt(df_bitcoin, window_size_btc)
+
+        # we cut according to the biggest window size
+        btc_supervised = btc_supervised[total_window_size:, :]
+
         # Concatenate with numpy
-        supervised = np.concatenate((bitcoin_values, supervised), axis=1)
+        supervised = np.concatenate((btc_supervised, supervised), axis=1)
 
     print('Use Trend Columns:   %s' % str(use_trend_columns))
     if use_trend_columns:
@@ -266,16 +339,13 @@ for combination in combinations:
         for column in trend_columns:
             df_trend[column] = series[column]
 
-        trend_values = df_trend.values
-        # We cut the first or last element to pair with the diff values.
-        bitcoin_values = bitcoin_values[1:, :]
-        # trend_values = trend_values[:-1, :]
-        # We cut from the bottom to pair with the supervised values. This will pair with the last day.
-        # trend_values = trend_values[:-window_size, :]
-        # We cut from the end and the bottom to pair with the supervised values. This will pair with the current day.
-        trend_values = trend_values[window_size - 1:-1, :]
+        trend_supervised = supervised_diff_dt(df_trend, window_size_trend)
+
+        # we cut according to the biggest window size
+        trend_supervised = trend_supervised[total_window_size:, :]
+
         # Concatenate with numpy
-        supervised = np.concatenate((trend_values, supervised), axis=1)
+        supervised = np.concatenate((trend_supervised, supervised), axis=1)
 
     # Supervised reffers either avg_supervised or the combination of avg_supervised with bitcoin_values.
     size_supervised = len(supervised)
@@ -315,7 +385,6 @@ for combination in combinations:
         corr_elastic_train_results.append(data_misc.correlation(y_train, y_predicted))
         print('RMSE Elastic %.3f' % (rmse))
 
-    # Lasso
     if use_LASSO:
         y_predicted_es, lasso_model = algorithms.lasso(x_train, y_train, x_train, normalize=False)
         rmse, y_predicted = compare_train(len_y_train, y_predicted_es)
@@ -325,7 +394,7 @@ for combination in combinations:
 
     # KNN5
     if use_KNN5:
-        y_predicted_es, knn5_model = algorithms.knn_regressor(x_train, y_train, x_train, 3)
+        y_predicted_es, knn5_model = algorithms.knn_regressor(x_train, y_train, x_train, 5)
         rmse, y_predicted = compare_train(len_y_train, y_predicted_es)
         knn5_train_results.append(rmse)
         corr_knn5_train_results.append(data_misc.correlation(y_train, y_predicted))
@@ -333,7 +402,7 @@ for combination in combinations:
 
     # KNN10
     if use_KNN10:
-        y_hat_predicted, knn10_model = algorithms.knn_regressor(x_train, y_train, x_train, 30)
+        y_hat_predicted, knn10_model = algorithms.knn_regressor(x_train, y_train, x_train, 10)
         rmse, y_predicted = compare_train(len_y_train, y_hat_predicted)
         knn10_train_results.append(rmse)
         corr_knn10_train_results.append(data_misc.correlation(y_train, y_predicted))
@@ -347,22 +416,18 @@ for combination in combinations:
         corr_sgd_train_results.append(data_misc.correlation(y_train, y_predicted))
         print('RMSE SGD     %.3f' % (rmse))
 
-    # LSTM
     if use_LSTM:
         # rmse, y_predicted = 0, 0
-        nb_epoch = 100
+        nb_epoch = 1
         neurons = total_features
         print("Epoch: %i  Neurons: %i" % (nb_epoch, neurons))
         y_predicted_es, lstm_model = algorithms.lstm(x_train, y_train, x_train, batch_size=1, nb_epoch=nb_epoch,
                                                      neurons=neurons)
-        # y_predicted_es, lstm_model = algorithms.lstm(x_train, y_train, x_train, batch_size=1, nb_epoch=200, neurons=10)
         rmse, y_predicted = compare_train(len_y_train, y_predicted_es)
         lstm_train_results.append(rmse)
         corr_lstm_train_results.append(data_misc.correlation(y_train, y_predicted))
         print('RMSE LSTM    %.3f' % (rmse))
-        print(lstm_model.summary())
 
-        # rmse, y_predicted = 0, 0
         # lstm_train_results.append(rmse)
         # corr_lstm_train_results.append(data_misc.correlation(y_train, y_predicted))
         # print('RMSE LSTM    %.3f' % (rmse))
@@ -466,7 +531,9 @@ results_df = DataFrame({
     '(Te) LSTM': lstm_test_results,
     '(Te) LSTM Corr': corr_lstm_test_results})
 
-col_win_size = []
+col_win_size_avg = []
+col_win_size_btc = []
+col_win_size_trend = []
 col_lag = []
 col_use_bitcoin = []
 col_bitcoin_data = []
@@ -474,14 +541,19 @@ col_use_trend = []
 col_trend_data = []
 
 for combination in combinations:
-    col_win_size.append(combination[window_size_index])
+    col_win_size_avg.append(combination[window_size_avg_index])
+    col_win_size_btc.append(combination[window_size_btc_index])
+    col_win_size_trend.append(combination[window_size_trend_index])
+
     col_lag.append(combination[lag_index])
     col_use_bitcoin.append(combination[use_bitcoin_columns_index])
     col_bitcoin_data.append(''.join(str(s + ' ') for s in combination[bitcoin_columns_index]))
     col_use_trend.append(combination[use_trend_columns_index])
     col_trend_data.append(''.join(combination[trend_column_index]))
 
-results_df['Window Size'] = col_win_size
+results_df['Window Size Avg'] = col_win_size_avg
+results_df['Window Size BTC'] = col_win_size_btc
+results_df['Window Size Trend'] = col_win_size_trend
 results_df['Lag'] = col_lag
 results_df['Use Bitcoin Columns'] = col_use_bitcoin
 results_df['Bitcoin_Data'] = col_bitcoin_data

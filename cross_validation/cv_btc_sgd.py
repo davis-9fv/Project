@@ -1,16 +1,14 @@
 from pandas import read_csv
 from Util import data_misc
-from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
 import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 from math import sqrt
-from sklearn.model_selection import KFold
 from Util import misc
 from sklearn.preprocessing import StandardScaler
 from sklearn import linear_model
+from sklearn.preprocessing import MinMaxScaler
 
+# https://machinelearningmastery.com/use-weight-regularization-lstm-networks-time-series-forecasting/
 window_size = 5  # 15
 path = 'C:/tmp/bitcoin/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
@@ -24,8 +22,9 @@ for i in range(0, 30):
 avg = series['Avg']
 avg_values = avg.values
 # Stationary Data
-diff_values = data_misc.difference(avg_values, 1)
-avg_values = diff_values
+#diff_values = data_misc.difference(avg_values, 1)
+#avg_values = diff_values
+
 print("Diff values")
 
 supervised = data_misc.timeseries_to_supervised(avg_values, window_size)
@@ -41,8 +40,10 @@ train = supervised[0:split_train_val]
 val = supervised[split_train_val:split_train_val + split_val_test]
 test = supervised[split_train_val + split_val_test:]
 
-scaler = StandardScaler()
-scaler.fit(train)
+scaler = MinMaxScaler(feature_range=(0, 1))
+scaler = scaler.fit(train)
+#scaler = StandardScaler()
+#scaler.fit(train)
 train = scaler.transform(train)
 val = scaler.transform(val)
 test = scaler.transform(test)
@@ -51,7 +52,7 @@ x_train, y_train = train[:, 0:-1], train[:, -1]
 x_val, y_val = val[:, 0:-1], val[:, -1]
 x_test, y_test = test[:, 0:-1], test[:, -1]
 
-print('SGD - BTC')
+print('LSTM - BTC')
 print('Window Size %i' % (window_size))
 print('Size Train %i' % (len(train)))
 print('Size Val %i' % (len(val)))
@@ -61,7 +62,7 @@ print('Size supervised %i' % (size_supervised))
 print('Size raw_values %i' % (len(avg_values)))
 
 #alphas = np.linspace(12, 0, 50)
-alphas = np.linspace(12, 0, 50)
+alphas = np.linspace(10, 0, 100)
 print(alphas)
 print("Total Alphas")
 print(len(alphas))
@@ -71,7 +72,7 @@ rmse_val = []
 rmse_test = []
 
 #‘squared_loss’, ‘huber’, ‘epsilon_insensitive’, or ‘squared_epsilon_insensitive’
-
+# 1000000
 print("Train VS Val")
 clf = linear_model.SGDRegressor(max_iter=2000, verbose=False, shuffle=False)
 for a in alphas:

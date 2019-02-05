@@ -53,6 +53,7 @@ print('Size supervised %i' % (size_supervised))
 print('Size raw_values %i' % (len(avg_values)))
 
 alphas = np.linspace(3, -3, 50)
+#alphas = [0.0612244898,0.0000001]
 print(alphas)
 print("Total Alphas")
 print(len(alphas))
@@ -70,7 +71,7 @@ for a in alphas:
     y_val_predicted = lasso.predict(x_val)
     rmse = sqrt(mean_squared_error(y_val, y_val_predicted))
     rmse_val.append(rmse)
-    print('RMSE Lasso   %.3f    Alpha:  %.10f,' % (rmse, a))
+    print('RMSE Elasticnet   %.3f    Alpha:  %.10f,' % (rmse, a))
 
 print("Train + Val VS Test")
 x_train_val = np.concatenate((x_train, x_val), axis=0)
@@ -84,7 +85,7 @@ for a in alphas:
     y_test_predicted = lasso.predict(x_test)
     rmse = sqrt(mean_squared_error(y_test, y_test_predicted))
     rmse_test.append(rmse)
-    print('RMSE Lasso   %.3f    Alpha:  %.10f,' % (rmse, a))
+    print('RMSE Elasticnet   %.3f    Alpha:  %.10f,' % (rmse, a))
 
 rmse_avg = np.add(rmse_val, rmse_test)
 rmse_avg = np.add(rmse_avg, 2)

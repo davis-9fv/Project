@@ -53,6 +53,7 @@ print('Size supervised %i' % (size_supervised))
 print('Size raw_values %i' % (len(avg_values)))
 
 alphas = np.linspace(3, -3, 50)
+
 print(alphas)
 print("Total Alphas")
 print(len(alphas))
