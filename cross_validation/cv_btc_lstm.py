@@ -97,8 +97,8 @@ time_start = datetime.datetime.now()
 print('Start time: %s' % str(time_start.strftime('%Y-%m-%d %H:%M:%S')))
 
 window_size = 5  # 15
-path = '/code/Project/data/'
-#path = 'C:/tmp/bitcoin/'
+#path = '/code/Project/data/'
+path = 'C:/tmp/bitcoin/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 output_file = 'cv_btc_lstm_results.csv'
 series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
@@ -150,25 +150,15 @@ print('Size Test %i' % (len(test)))
 print('Size supervised %i' % (size_supervised))
 print('Size raw_values %i' % (len(avg_values)))
 
-l1 = np.linspace(3, -3, 10)
-l1_ = []
-for val in l1:
-    l1_.append(val)
+l1 = np.arange(0, 1, 0.2)
+l2 = np.arange(0, 1, 0.2)
 
-l1_.append(0)
-
-l2 = np.linspace(3, -3, 10)
-l2_ = []
-for val in l2:
-    l2_.append(val)
-
-l2_.append(0)
-
-neurons_list = [4, 5, 6, 7, 8]
+neurons_list = [4, 5, 6]
 epochs_list = [100, 150, 200]
-alphas_list = [l1_, l2_]
+alphas_list = [l1, l2]
 alphas_list = list(itertools.product(*alphas_list))
-n_repeats = 10
+n_repeats = 5
+
 
 print(alphas_list)
 print("Total Alphas")
@@ -182,6 +172,7 @@ overal_result = []
 print("Configuration:::")
 print("neurons_list:    %s" % (neurons_list))
 print("epochs_list:     %s" % (epochs_list))
+print("N° of Alphas:    %s" % (len(alphas_list)))
 print("alphas_list:     %s" % (alphas_list))
 print("n_repeats:       %s" % (n_repeats))
 
