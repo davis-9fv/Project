@@ -97,14 +97,12 @@ def experiment(neurons, epochs, alpha, n_repeats):
 
 
 window_size = 5  # 15
-path = 'C:/tmp/bitcoin/'
+path = '/code/Project/data/'
+#path = 'C:/tmp/bitcoin/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 output_file = 'cv_btc_lstm_results.csv'
 series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
 series = series.iloc[::-1]
-
-
-
 
 for i in range(0, 30):
     corr = series['Avg'].autocorr(lag=i)
@@ -222,5 +220,5 @@ overal_result = [[4.8764619190322449, 2.4759713560382588, 3.6762166375352519, 3,
 print(overal_result)
 columns = ['rmse_val_avg', 'rmse_test_avg', 'rmse_total_avg', 'neurons', 'epochs', 'alpha[0]',
            'alpha[1]', 'n_repeats']
-df_results = DataFrame(overal_result,columns=columns)
+df_results = DataFrame(overal_result, columns=columns)
 df_results.to_csv(path + output_file, header=True)
