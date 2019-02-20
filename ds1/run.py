@@ -96,9 +96,9 @@ def main(use_dummy, use_elasticnet, use_lasso, use_knn, use_sgd, use_lstm):
 
 if __name__ == '__main__':
     use_dummy = False
-    use_elasticnet = False
+    use_elasticnet = True
     use_lasso = False
     use_knn = False
-    use_sgd = True
+    use_sgd = False
     use_lstm = False
     main(use_dummy, use_elasticnet, use_lasso, use_knn, use_sgd, use_lstm)

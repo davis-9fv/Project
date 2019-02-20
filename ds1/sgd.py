@@ -3,19 +3,21 @@ import numpy as np
 
 
 def sgd(x_train, y_train, x_val, y_val, x_test):
-    alphas = np.linspace(10, 0, 100)
+    alphas = np.linspace(5, 0, 50)
     print('SGD')
     print(alphas)
     print("Total Alphas %i" % (len(alphas)))
 
     print("Train VS Val")
-    sgd = linear_model.SGDRegressor(max_iter=100000000, verbose=False, shuffle=False)
+    # For time we choose max_iter=8000
+    sgd = linear_model.SGDRegressor(max_iter=8000, verbose=False, shuffle=False)
     y_val_predicted_list = []
     y_train_val_predicted_list = []
     y_test_predicted_list = []
 
     for a in alphas:
         sgd.set_params(alpha=a)
+        #print(a)
         sgd.fit(x_train, y_train)
         y_val_predicted_list.append(sgd.predict(x_val))
 
