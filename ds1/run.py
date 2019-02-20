@@ -32,9 +32,9 @@ def main(use_dummy, use_elasticnet, use_lasso, use_knn, use_sgd, use_lstm):
     time_start = datetime.datetime.now()
     print('Start time: %s' % str(time_start.strftime('%Y-%m-%d %H:%M:%S')))
 
-    results.results_accuracy([100, 110, 120, 90], [101, 105, 130, 95])
+    #results.results_accuracy([100, 110, 120, 90], [101, 105, 130, 95])
 
-    windows_sizes = [4, 5, 6]
+    windows_sizes = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     for window_size in windows_sizes:
         print('\n')
         supervised = dc.create_supervised_ds(window_size)
