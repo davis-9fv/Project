@@ -9,7 +9,7 @@ def elasticnet(x_train, y_train, x_val, y_val, x_test):
     print("Total Alphas %i" % (len(alphas)))
 
     print("Train VS Val")
-    elasticnet = linear_model.ElasticNet(max_iter=1000000, normalize=False)
+    elasticnet = linear_model.ElasticNet(max_iter=100000000, normalize=False)
     y_val_predicted_list = []
     y_train_val_predicted_list = []
     y_test_predicted_list = []
