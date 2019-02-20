@@ -67,54 +67,6 @@ def compare_test(len_y_test=0, y_predicted=[]):
     return rmse, predictions
 
 
-def get_combinations(comb):
-    comb = list(itertools.product(*comb))
-    purged_combinations = []
-    for win_size in window_size_opt:
-        flag_false_bit_false_trend = True
-        flag_false_bit_true_trend = True
-        flag_true_bit_false_trend = True
-        for combination in comb:
-            if win_size == combination[window_size_index]:
-                use_bitcoin_columns = combination[use_bitcoin_columns_index]
-                use_trend_columns = combination[use_trend_columns_index]
-                save = True
-                purged_comb = ["", "", "", "", "", ""]
-                purged_comb[window_size_index] = combination[window_size_index]
-                purged_comb[lag_index] = combination[lag_index]
-
-                purged_comb[use_bitcoin_columns_index] = combination[use_bitcoin_columns_index]
-                purged_comb[bitcoin_columns_index] = combination[bitcoin_columns_index]
-
-                purged_comb[use_trend_columns_index] = combination[use_trend_columns_index]
-                purged_comb[trend_column_index] = combination[trend_column_index]
-
-                if not use_bitcoin_columns and not use_trend_columns:
-                    if flag_false_bit_false_trend:
-                        purged_comb[use_bitcoin_columns_index] = False
-                        purged_comb[bitcoin_columns_index] = [""]
-                        purged_comb[use_trend_columns_index] = False
-                        purged_comb[trend_column_index] = [""]
-                        flag_false_bit_false_trend = False
-                    else:
-                        save = False
-
-                if not use_bitcoin_columns and use_trend_columns:
-                    if flag_false_bit_true_trend:
-                        flag_false_bit_true_trend = False
-                        purged_comb[use_bitcoin_columns_index] = False
-                        purged_comb[bitcoin_columns_index] = [""]
-                    else:
-                        save = False
-
-                if not use_trend_columns:
-                    purged_comb[trend_column_index] = [""]
-
-                if save:
-                    purged_combinations.append(purged_comb)
-
-    return purged_combinations
-
 
 time_start = datetime.datetime.now()
 print('Start time: %s' % str(time_start.strftime('%Y-%m-%d %H:%M:%S')))
@@ -125,18 +77,12 @@ result = list()
 write_file = True
 plot = False
 
-cross_validation_opt = [False]
-use_bitcoin_data_opt = [False]
-use_trend_column_opt = [False]
 # window_size_opt = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-# window_size_opt = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14]
-window_size_opt = [5]
+window_size_opt = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14]
+#window_size_opt = [5]
 
-lag = [1]
-bitcoin_columns_opt = values.bitcoin_columns_opt_2_col
-trend_columns_opt = [
-    ['Trend']
-]
+lag = 1
+
 
 # Use of algorithms
 use_Dummy = True
@@ -182,20 +128,9 @@ corr_sgd_test_results = []
 corr_lstm_test_results = []
 
 window_size_index = 0
-lag_index = 1
-use_bitcoin_columns_index = 2
-bitcoin_columns_index = 3
-use_trend_columns_index = 4
-trend_column_index = 5
 
-combinations = [window_size_opt,
-                lag,
-                use_bitcoin_data_opt,
-                bitcoin_columns_opt,
-                use_trend_column_opt,
-                trend_columns_opt]
-# combinations = [window_size,lag]
-combinations = get_combinations(combinations)
+
+combinations = window_size_opt
 total_models = len(combinations)
 print('Quantity of Models: %s' % str(total_models))
 model_count = 0
@@ -220,12 +155,8 @@ lstm_model = None
 
 for combination in combinations:
     model_count = model_count + 1
-    window_size = combination[window_size_index]
-    lag = combination[lag_index]
-    use_bitcoin_columns = combination[use_bitcoin_columns_index]
-    bitcoin_columns = combination[bitcoin_columns_index]
-    use_trend_columns = combination[use_trend_columns_index]
-    trend_columns = combination[trend_column_index]
+    window_size = combination
+
 
     print('----------')
     print(combination)
@@ -241,43 +172,7 @@ for combination in combinations:
     supervised = avg_supervised
     print('Window Size:         %s' % str(window_size))
     print('Lag:                 %s' % str(lag))
-    print('Use Bitcoin Columns: %s' % str(use_bitcoin_columns))
-    if use_bitcoin_columns:
-        print('Bitcoin Columns:     %s' % str(bitcoin_columns))
-        df_bitcoin = DataFrame()
-        for column in bitcoin_columns:
-            df_bitcoin[column] = series[column]
 
-        bitcoin_values = df_bitcoin.values
-        # We cut the first or last element to pair with the diff values.
-        bitcoin_values = bitcoin_values[1:, :]
-        # bitcoin_values = bitcoin_values[:-1, :]
-        # We cut from the bottom to pair with the supervised values. This will pair with the last day.
-        # bitcoin_values = bitcoin_values[:-window_size, :]
-        # We cut from the end and the bottom to pair with the supervised values. This will pair with the current day.
-        bitcoin_values = bitcoin_values[window_size - 1:-1, :]
-        # Concatenate with numpy
-        supervised = np.concatenate((bitcoin_values, supervised), axis=1)
-
-    print('Use Trend Columns:   %s' % str(use_trend_columns))
-    if use_trend_columns:
-        print('Trend Columns:     %s' % str(trend_columns))
-        df_trend = DataFrame()
-        for column in trend_columns:
-            df_trend[column] = series[column]
-
-        trend_values = df_trend.values
-        # We cut the first or last element to pair with the diff values.
-        bitcoin_values = bitcoin_values[1:, :]
-        # trend_values = trend_values[:-1, :]
-        # We cut from the bottom to pair with the supervised values. This will pair with the last day.
-        # trend_values = trend_values[:-window_size, :]
-        # We cut from the end and the bottom to pair with the supervised values. This will pair with the current day.
-        trend_values = trend_values[window_size - 1:-1, :]
-        # Concatenate with numpy
-        supervised = np.concatenate((trend_values, supervised), axis=1)
-
-    # Supervised reffers either avg_supervised or the combination of avg_supervised with bitcoin_values.
     size_supervised = len(supervised)
     split = int(size_supervised * 0.80)
     train, test = supervised[0:split], supervised[split:]
@@ -333,7 +228,7 @@ for combination in combinations:
 
     # KNN10
     if use_KNN10:
-        y_hat_predicted, knn10_model = algorithms.knn_regressor(x_train, y_train, x_train, 30)
+        y_hat_predicted, knn10_model = algorithms.knn_regressor(x_train, y_train, x_train, 20)
         rmse, y_predicted = compare_train(len_y_train, y_hat_predicted)
         knn10_train_results.append(rmse)
         corr_knn10_train_results.append(data_misc.correlation(y_train, y_predicted))
@@ -350,7 +245,7 @@ for combination in combinations:
     # LSTM
     if use_LSTM:
         # rmse, y_predicted = 0, 0
-        nb_epoch = 100
+        nb_epoch = 1
         neurons = total_features
         print("Epoch: %i  Neurons: %i" % (nb_epoch, neurons))
         y_predicted_es, lstm_model = algorithms.lstm(x_train, y_train, x_train, batch_size=1, nb_epoch=nb_epoch,
@@ -474,19 +369,10 @@ col_use_trend = []
 col_trend_data = []
 
 for combination in combinations:
-    col_win_size.append(combination[window_size_index])
-    col_lag.append(combination[lag_index])
-    col_use_bitcoin.append(combination[use_bitcoin_columns_index])
-    col_bitcoin_data.append(''.join(str(s + ' ') for s in combination[bitcoin_columns_index]))
-    col_use_trend.append(combination[use_trend_columns_index])
-    col_trend_data.append(''.join(combination[trend_column_index]))
+    col_win_size.append(combination)
 
 results_df['Window Size'] = col_win_size
-results_df['Lag'] = col_lag
-results_df['Use Bitcoin Columns'] = col_use_bitcoin
-results_df['Bitcoin_Data'] = col_bitcoin_data
-results_df['Use Trend Columns'] = col_use_trend
-results_df['Trend Columns'] = col_trend_data
+
 
 print(results_df)
 

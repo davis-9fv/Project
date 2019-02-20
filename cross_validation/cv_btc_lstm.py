@@ -11,15 +11,17 @@ from keras.layers import LSTM
 from keras.regularizers import L1L2
 from pandas import DataFrame
 import datetime
+import argparse
+
 
 # https://machinelearningmastery.com/use-weight-regularization-lstm-networks-time-series-forecasting/
 
-def lstm(x_train, y_train, x_to_predict, batch_size, nb_epoch=3, neurons=3, l1l2=[]):
+def lstm(x_train, y_train, x_to_predict, batch_size, nb_epoch=3, neurons=3):
     x_train = x_train.reshape(x_train.shape[0], 1, x_train.shape[1])
     model = Sequential()
-    l1 = l1l2[0]
-    l2 = l1l2[1]
+
     model.add(LSTM(neurons,
+                   activation='tanh',
                    bias_regularizer=L1L2(l1=l1, l2=l2),
                    batch_input_shape=(batch_size, x_train.shape[1], x_train.shape[2]),
                    stateful=True))
@@ -50,7 +52,7 @@ def lstm_predict(model, x_to_predict, batch_size):
     return y_predicted
 
 
-def experiment(neurons, epochs, alpha, n_repeats):
+def experiment(neurons, epochs, n_repeats):
     rmse_val = []
     rmse_test = []
     result = []
@@ -58,13 +60,13 @@ def experiment(neurons, epochs, alpha, n_repeats):
     print("Neurons: %i      Epochs: %i      NRepetitions: %i" % (neurons, epochs, n_repeats))
     for r in range(n_repeats):
         np.random.seed(r)
-        print(":: Repetition %i/%i      L1: %s   L2: %s" % (r + 1, n_repeats, alpha[0], alpha[1]))
+        print(":: Repetition %i/%i      L1: %s   L2: %s" % (r + 1, n_repeats, l1, l2))
         print("Train VS Val")
         y_val_predicted, lstm_model = lstm(x_train, y_train, x_val,
                                            neurons=neurons,
                                            nb_epoch=epochs,
                                            batch_size=1,
-                                           l1l2=alpha)
+                                           )
         rmse = sqrt(mean_squared_error(y_val, y_val_predicted))
         rmse_val.append(rmse)
         print('     RMSE LSTM   %.3f' % (rmse))
@@ -76,8 +78,7 @@ def experiment(neurons, epochs, alpha, n_repeats):
         y_test_predicted, lstm_model = lstm(x_train_val, y_train_val, x_test,
                                             neurons=neurons,
                                             nb_epoch=epochs,
-                                            batch_size=1,
-                                            l1l2=alpha)
+                                            batch_size=1)
         rmse = sqrt(mean_squared_error(y_test, y_test_predicted))
         rmse_test.append(rmse)
         print('     RMSE LSTM   %.3f' % (rmse))
@@ -90,14 +91,21 @@ def experiment(neurons, epochs, alpha, n_repeats):
     rmse_test_avg = np.average(rmse_test)
 
     # result.append()
-    return [rmse_val_avg, rmse_test_avg, rmse_total_avg, neurons, epochs, alpha[0], alpha[1], n_repeats]
+    return [rmse_val_avg, rmse_test_avg, rmse_total_avg, neurons, epochs, l1, l2, n_repeats]
 
+
+parser = argparse.ArgumentParser(description='Process LSTM.')
+parser.add_argument('--l1', type=float,
+                    help='L1 Alpha')
+parser.add_argument('--l2', type=float,
+                    help='L2 Alpha')
+args = parser.parse_args()
 
 time_start = datetime.datetime.now()
 print('Start time: %s' % str(time_start.strftime('%Y-%m-%d %H:%M:%S')))
 
 window_size = 5  # 15
-#path = '/code/Project/data/'
+# path = '/code/Project/data/'
 path = 'C:/tmp/bitcoin/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 output_file = 'cv_btc_lstm_results.csv'
@@ -150,15 +158,17 @@ print('Size Test %i' % (len(test)))
 print('Size supervised %i' % (size_supervised))
 print('Size raw_values %i' % (len(avg_values)))
 
-l1 = np.arange(0, 1, 0.2)
-l2 = np.arange(0, 1, 0.2)
+# l1 = np.arange(0, 1, 0.2)
+# l2 = np.arange(0, 1, 0.2)
+l1 = args.l1
+l2 = args.l2
 
 neurons_list = [4, 5, 6]
 epochs_list = [100, 150, 200]
-alphas_list = [l1, l2]
-alphas_list = list(itertools.product(*alphas_list))
-n_repeats = 5
-
+alphas_list = [float(l1), float(l2)]
+# alphas_list = list(itertools.product(*alphas_list))
+# alphas_list = args.alphas
+n_repeats = 3
 
 print(alphas_list)
 print("Total Alphas")
@@ -179,15 +189,14 @@ print("n_repeats:       %s" % (n_repeats))
 for neurons in neurons_list:
     print("\n\n")
     print("Working on Neuron %i" % (neurons))
+
     for epochs in epochs_list:
-
         print("Working on epoch %i" % (epochs))
-        for alpha in alphas_list:
-            print("Working on alpha %s %s" % (alpha[0], alpha[1]))
-            overal_result.append(experiment(neurons, epochs, alpha, n_repeats))
-            # print("\n")
 
+        overal_result.append(experiment(neurons, epochs, n_repeats))
         # print("\n")
+
+    # print("\n")
 
 """
 overal_result = [[4.8764619190322449, 2.4759713560382588, 3.6762166375352519, 3, 1, 3.0, 3.0, 1],
@@ -210,10 +219,10 @@ overal_result = [[4.8764619190322449, 2.4759713560382588, 3.6762166375352519, 3,
                  [4.1340378936483999, 3.635274839866077, 3.8846563667572385, 4, 1, 0, 0, 1]]
 """
 print(overal_result)
-columns = ['rmse_val_avg', 'rmse_test_avg', 'rmse_total_avg', 'neurons', 'epochs', 'alpha[0]',
-           'alpha[1]', 'n_repeats']
+columns = ['rmse_val_avg', 'rmse_test_avg', 'rmse_total_avg', 'neurons', 'epochs', 'L1',
+           'L2', 'n_repeats']
 df_results = DataFrame(overal_result, columns=columns)
-df_results.to_csv(path + output_file, header=True)
+df_results.to_csv(path + output_file, header=False, mode='a')
 
 time_end = datetime.datetime.now()
 print('End time: %s' % str(time_end.strftime('%Y-%m-%d %H:%M:%S')))

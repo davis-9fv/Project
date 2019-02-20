@@ -101,7 +101,7 @@ def create_figure(label='label', width=800, height=150, date=[], column=[], lege
     return p
 
 
-def plot_cross_validation(title="Cross Validation", alphas=[], best_alpha=0, rmse_val=[], rmse_test=[]):
+def plot_cross_validation(title="Cross Validation", alphas=[], best_val=0, rmse_val=[], rmse_test=[]):
     p1 = figure(title=title)
     p1.grid.grid_line_alpha = 1
     p1.xaxis.axis_label = 'Model Complexity'
@@ -109,14 +109,14 @@ def plot_cross_validation(title="Cross Validation", alphas=[], best_alpha=0, rms
     colors = ['red', 'blue', 'black']
     line_dash = ['4 3', '5 4']
 
-    vline = Span(location=best_alpha, dimension='height', line_color='gray', line_width=1)
+    vline = Span(location=best_val, dimension='height', line_color=colors[0] , line_width=1)
     p1.renderers.extend([vline])
 
-    p1.line(best_alpha, rmse_val, color=colors[0], line_width=1)
-    p1.line(alphas, rmse_val, color=colors[0], line_width=1)
-    p1.line(alphas, rmse_test, color=colors[1], line_width=1)
+    #p1.line(best_val, rmse_val, legend="Best Validation", color=colors[0], line_width=1)
+    p1.line(alphas, rmse_val,  legend="Validation", color=colors[0], line_width=1.2)
+    p1.line(alphas, rmse_test, legend="Test", color=colors[1], line_width=1.2)
 
-    p1.legend.location = "top_left"
+    p1.legend.location = "top_right"
 
     output_file('../tmp/' + title + '.html', title=title)
     show(gridplot([[p1]], plot_width=500, plot_height=300))  # open a browser

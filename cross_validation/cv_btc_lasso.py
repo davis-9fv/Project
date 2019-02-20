@@ -87,23 +87,22 @@ for a in alphas:
     rmse_test.append(rmse)
     print('RMSE Lasso   %.3f    Alpha:  %.10f,' % (rmse, a))
 
-rmse_avg = np.add(rmse_val, rmse_test)
-rmse_avg = np.add(rmse_avg, 2)
 
-print("Best Alpha")
-best_alpha = alphas[rmse_avg.argmin()]
+print("Index Best Alpha")
+index = np.array(rmse_val)
+index = np.where(index == index.min())
+index = np.array(index).flatten()
+index = index[0]
+print(index)
+
+print("Best Alhpa")
+best_alpha = alphas[index]
 print(best_alpha)
 
 print("Best RMSE of Val")
-print(rmse_val[rmse_avg.argmin()])
+print(min(rmse_val))
 
 print("Best RMSE of Test")
-print(rmse_test[rmse_avg.argmin()])
+print(min(rmse_test))
 
-print("RMSE AVG Lowest Value (Val + Test)")
-print(rmse_avg.min())
-
-print("RMSE Index from Lowest Value")
-print(rmse_avg.argmin())
-
-misc.plot_cross_validation(alphas=alphas, best_alpha=best_alpha, rmse_val=rmse_val, rmse_test=rmse_test)
+misc.plot_cross_validation(alphas=alphas, best_val=best_alpha, rmse_val=rmse_val, rmse_test=rmse_test)

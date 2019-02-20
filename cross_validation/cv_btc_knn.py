@@ -6,7 +6,6 @@ from math import sqrt
 from sklearn.metrics import mean_squared_error
 from Util import misc
 
-
 window_size = 5  # 15
 path = 'C:/tmp/bitcoin/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
@@ -50,7 +49,7 @@ print('Size Test %i' % (len(test)))
 print('Size supervised %i' % (size_supervised))
 print('Size raw_values %i' % (len(avg_values)))
 
-n_neighbors = [2,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,120]
+n_neighbors = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 120]
 print(n_neighbors)
 print("Total Neighbors")
 print(len(n_neighbors))
@@ -60,7 +59,8 @@ rmse_val = []
 rmse_test = []
 
 print("Train VS Val")
-neigh = KNeighborsRegressor(algorithm='kd_tree', leaf_size=30, weights='uniform', n_jobs=4)
+neigh = KNeighborsRegressor(algorithm='kd_tree', leaf_size=30, weights='uniform', n_jobs=-1)
+
 for a in n_neighbors:
     neigh.set_params(n_neighbors=a)
     neigh.fit(x_train, y_train)
@@ -68,13 +68,12 @@ for a in n_neighbors:
     y_val_predicted = neigh.predict(x_val)
     rmse = sqrt(mean_squared_error(y_val, y_val_predicted))
     rmse_val.append(rmse)
-    print('RMSE Lasso   %.3f    Alpha:  %.10f,' % (rmse, a))
+    print('RMSE KNN   %.3f    N. Neighbours:  %i' % (rmse, a))
 
 print("Train + Val VS Test")
 x_train_val = np.concatenate((x_train, x_val), axis=0)
 y_train_val = np.concatenate((y_train, y_val), axis=0)
 
-neigh = KNeighborsRegressor(algorithm='kd_tree', leaf_size=30, weights='uniform', n_jobs=4)
 for a in n_neighbors:
     neigh.set_params(n_neighbors=a)
     neigh.fit(x_train_val, y_train_val)
@@ -82,25 +81,24 @@ for a in n_neighbors:
     y_test_predicted = neigh.predict(x_test)
     rmse = sqrt(mean_squared_error(y_test, y_test_predicted))
     rmse_test.append(rmse)
-    print('RMSE Lasso   %.3f    Alpha:  %.10f,' % (rmse, a))
+    print('RMSE KNN   %.3f    N. Neighbours:  %i' % (rmse, a))
 
-rmse_avg = np.add(rmse_val, rmse_test)
-rmse_avg = np.add(rmse_avg, 2)
 
-print("Best Neighbor")
-best_neighbor = n_neighbors[rmse_avg.argmin()]
+print("Index Best Neighbor - Val")
+index = np.array(rmse_val)
+index = np.where(index == index.min())
+index = np.array(index).flatten()
+index = index[0]
+print(index)
+
+print("Best Neighbor - Val")
+best_neighbor = n_neighbors[index]
 print(best_neighbor)
 
 print("Best RMSE of Val")
-print(rmse_val[rmse_avg.argmin()])
+print(min(rmse_val))
 
 print("Best RMSE of Test")
-print(rmse_test[rmse_avg.argmin()])
+print(min(rmse_test))
 
-print("RMSE AVG Lowest Value (Val + Test)")
-print(rmse_avg.min())
-
-print("RMSE Index from Lowest Value")
-print(rmse_avg.argmin())
-
-misc.plot_cross_validation(alphas=n_neighbors, best_alpha=best_neighbor, rmse_val=rmse_val, rmse_test=rmse_test)
+misc.plot_cross_validation(alphas=n_neighbors, best_val=best_neighbor, rmse_val=rmse_val, rmse_test=rmse_test)
