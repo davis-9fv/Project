@@ -54,6 +54,7 @@ def lstm(x_train, y_train, x_to_predict, batch_size, nb_epoch=3, neurons=3):
     model.add(LSTM(neurons,
                    activation=activation,
                    bias_regularizer=L1L2(l1=0.01, l2=0.01),
+                   kernel_regularizer=
                    batch_input_shape=(batch_size, x_train.shape[1], x_train.shape[2]),
                    stateful=True))
 

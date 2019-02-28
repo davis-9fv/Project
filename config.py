@@ -5,6 +5,7 @@ path_linux2 = '/home/francisco/Project/data/'
 selected_path = path_windows
 input_file_ds = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 
+algorithm_no_predcition = 'no_prediction'
 algorithm_dummy = 'dummy'
 algorithm_elasticnet = 'elasticnet'
 algorithm_lasso = 'lasso'
@@ -12,6 +13,7 @@ algorithm_knn = 'knn'
 algorithm_sgd = 'sgd'
 algorithm_lstm = 'lstm'
 
+output_file_no_prediction = 'no_prediction.csv'
 output_file_dummy = 'dummy.csv'
 output_file_elasticnet = 'elasticnet.csv'
 output_file_lasso = 'lasso.csv'

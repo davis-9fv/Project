@@ -3,6 +3,7 @@ import pandas as pd
 import config as conf
 import os.path
 from sklearn.metrics import accuracy_score
+from Util import data_misc
 
 
 def results_train_val(window_size, scaler, x_train, y_train_predicted_es):
@@ -54,14 +55,23 @@ def results_overall(window_size, scaler, iterations, x_train, x_val, x_test, y_t
 
 
 def restults_df(algorithm, window_size, parameter_name, parameter_list,
-                rmse_tr_val_li, rmse_val_li, rmse_te_li, accu_list):
+                rmse_tr_val_li, rmse_val_li, rmse_te_li,
+                accu_list, ratio_up_li, ratio_down_li,
+                y_tr_val_hat_corr_li, y_val_hat_corr_li, y_test_hat_corr_li):
     df = pd.DataFrame({'Window Size': window_size,
                        parameter_name: parameter_list,
                        'RMSE Train + Val': rmse_tr_val_li,
-                       'RMSE Val': rmse_val_li,
+                       'RMSE_Val': rmse_val_li,
                        'RMSE Test': rmse_te_li,
-                       'Accu': accu_list})
+                       'Accu': accu_list,
+                       '% positive': ratio_up_li,
+                       '% negative': ratio_down_li,
+                       'Corr Train + Val': y_tr_val_hat_corr_li,
+                       'Corr Val': y_val_hat_corr_li,
+                       'Corr Test': y_test_hat_corr_li})
     output_file = ""
+    if algorithm == conf.algorithm_no_predcition:
+        output_file = conf.output_file_no_prediction
     if algorithm == conf.algorithm_dummy:
         output_file = conf.output_file_dummy
     if algorithm == conf.algorithm_elasticnet:
@@ -81,16 +91,36 @@ def restults_df(algorithm, window_size, parameter_name, parameter_list,
     else:
         df.to_csv(filename, sep=',', header=True)
 
+    print(df)
+    print(df.iloc[df.RMSE_Val.argmin(), :])
+
 
 def results_accuracy(y_test, y_hat):
     y_test_acc = []
     y_hat_acc = []
+
+    ratio_up = 0
+    ratio_down = 0
+
     for i in range(len(y_test)):
         if i < len(y_test) - 1:
             if y_test[i] > y_test[i + 1]:
                 y_test_acc.append(0)
             else:
                 y_test_acc.append(1)
+
+    # Count how many 0 and 1 is in y_test_acc
+    for i in range(len(y_test_acc)):
+        # count how many 0 is in y_test_acc
+        if y_test_acc[i] == 0:
+            ratio_down = ratio_down + 1
+
+        # Count how mnay 1 is in y_test_acc
+        if y_test_acc[i] == 1:
+            ratio_up = ratio_up + 1
+
+    ratio_up = ratio_up / len(y_test_acc)
+    ratio_down = ratio_down / len(y_test_acc)
 
     for i in range(len(y_test)):
         if i < len(y_test) - 1:
@@ -100,17 +130,39 @@ def results_accuracy(y_test, y_hat):
                 y_hat_acc.append(1)
 
     accu = accuracy_score(y_test_acc, y_hat_acc, normalize=True)
-    #print(accu)
-    #print(y_test_acc)
-    #print(y_hat_acc)
 
-    return accu
+    # print(accu)
+    # print(y_test_acc)
+    # print(y_hat_acc)
+
+    return accu, ratio_up, ratio_down
 
 
-def results_accuracy_li(y_test_li, y_hat_li):
+def results_corr(y_train_val, y_val, y_test, y_tr_vl_hat_es_li, y_val_hat_es_li,
+                 y_te_pred_es_li):
+    y_tr_val_hat_corr_li = []
+    y_val_hat_corr_li = []
+    y_test_hat_corr_li = []
+
+    for i in range(len(y_te_pred_es_li)):
+        corr = data_misc.correlation(y_train_val, y_tr_vl_hat_es_li[i])
+        y_tr_val_hat_corr_li.append(corr)
+        corr = data_misc.correlation(y_val, y_val_hat_es_li[i])
+        y_val_hat_corr_li.append(corr)
+        corr = data_misc.correlation(y_test, y_te_pred_es_li[i])
+        y_test_hat_corr_li.append(corr)
+
+    return y_tr_val_hat_corr_li, y_val_hat_corr_li, y_test_hat_corr_li
+
+
+def results_accuracy_li(y_test, y_hat_li):
     accu_li = []
+    ratio_up_li = []
+    ratio_down_li = []
     for i in range(len(y_hat_li)):
-        accu = results_accuracy(y_test_li, y_hat_li[i])
+        accu, count_up, count_down = results_accuracy(y_test, y_hat_li[i])
         accu_li.append(accu)
+        ratio_up_li.append(count_up)
+        ratio_down_li.append(count_down)
 
-    return accu_li
+    return accu_li, ratio_up_li, ratio_down_li

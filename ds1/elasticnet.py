@@ -3,7 +3,7 @@ import numpy as np
 
 
 def elasticnet(x_train, y_train, x_val, y_val, x_test):
-    alphas = np.linspace(3, -3, 50)
+    alphas = np.linspace(3, 0, 50)
     print('Elasticnet')
     print(alphas)
     print("Total Alphas %i" % (len(alphas)))

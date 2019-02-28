@@ -74,7 +74,7 @@ rmse_test = []
 #‘squared_loss’, ‘huber’, ‘epsilon_insensitive’, or ‘squared_epsilon_insensitive’
 # 1000000
 print("Train VS Val")
-clf = linear_model.SGDRegressor(max_iter=2000, verbose=False, shuffle=False)
+clf = linear_model.SGDRegressor(max_iter=5000, verbose=False, shuffle=False)
 for a in alphas:
     clf.set_params(alpha=a)
     clf.fit(x_train, y_train)
