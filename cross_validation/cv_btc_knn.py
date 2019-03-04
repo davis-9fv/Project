@@ -1,10 +1,10 @@
 from pandas import read_csv
-from Util import data_misc
+from util import data_misc
 import numpy as np
 from sklearn.neighbors import KNeighborsRegressor
 from math import sqrt
 from sklearn.metrics import mean_squared_error
-from Util import misc
+from graphs import plots
 
 window_size = 5  # 15
 path = 'C:/tmp/bitcoin/'
@@ -101,4 +101,4 @@ print(min(rmse_val))
 print("Best RMSE of Test")
 print(min(rmse_test))
 
-misc.plot_cross_validation(alphas=n_neighbors, best_val=best_neighbor, rmse_val=rmse_val, rmse_test=rmse_test)
+plots.plot_cross_validation(alphas=n_neighbors, best_val=best_neighbor, rmse_val=rmse_val, rmse_test=rmse_test)

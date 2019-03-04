@@ -1,5 +1,5 @@
 from pandas import read_csv
-from Util import data_misc
+from util import data_misc
 from sklearn.metrics import mean_squared_error
 import numpy as np
 from math import sqrt

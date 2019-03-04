@@ -1,13 +1,10 @@
 from pandas import read_csv
-from Util import data_misc
+from util import data_misc
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
 import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 from math import sqrt
-from sklearn.model_selection import KFold
-from Util import misc
+from graphs import plots
 
 window_size = 5  # 15
 path = 'C:/tmp/bitcoin/'
@@ -106,4 +103,4 @@ print(rmse_avg.min())
 print("RMSE Index from Lowest Value")
 print(rmse_avg.argmin())
 
-misc.plot_cross_validation(alphas=alphas, best_alpha=best_alpha, rmse_val=rmse_val, rmse_test=rmse_test)
+plots.plot_cross_validation(alphas=alphas, best_alpha=best_alpha, rmse_val=rmse_val, rmse_test=rmse_test)

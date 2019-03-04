@@ -1,13 +1,11 @@
 import datetime
-from Util import algorithms
+from util import algorithms
 from pandas import DataFrame
 from pandas import read_csv
 from sklearn.metrics import mean_squared_error
 from math import sqrt
-from Util import data_misc
+from util import data_misc
 import numpy as np
-import itertools
-from model import values
 
 
 def diff_df(df_data):

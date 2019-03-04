@@ -1,13 +1,13 @@
 import datetime
-from Util import algorithms
+from util import algorithms
 from pandas import DataFrame
 from pandas import read_csv
 from sklearn.metrics import mean_squared_error
 from math import sqrt
-from Util import data_misc
+from util import data_misc
 import numpy as np
 import itertools
-from model import values
+import btc_columns
 
 
 def supervised_diff_dt(df_data, window_size):
@@ -141,7 +141,7 @@ window_size_btc_opt = [3]
 window_size_trend_opt = [3]
 
 lag = [1]
-bitcoin_columns_opt = values.bitcoin_columns_opt_test
+bitcoin_columns_opt = btc_columns.bitcoin_columns_opt_test
 trend_columns_opt = [
     ['Trend']
 ]

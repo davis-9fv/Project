@@ -1,7 +1,7 @@
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 import pandas as pd
-from Util import misc
+from graphs import plots
 
 
 def compare(y_test, y_predicted):
@@ -23,4 +23,4 @@ for i in range(0, max_lag-1):
     correlations[i] = corr * 100
     print('Corr: %.2f Lang: %i' % (corr, i))
 
-misc.plot_one_line('Correlation by Month', lags, correlations, 'Lag', 'Correlation')
+plots.plot_one_line('Correlation by Month', lags, correlations, 'Lag', 'Correlation')

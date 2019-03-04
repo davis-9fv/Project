@@ -1,11 +1,9 @@
 from pandas import read_csv
 from sklearn.metrics import mean_squared_error
 from math import sqrt
-from Util import misc
-from Util import data_misc
+from graphs import plots
+from util import data_misc
 from sklearn.linear_model import ElasticNet
-from sklearn.utils import shuffle
-import numpy as np
 import datetime
 
 
@@ -83,7 +81,7 @@ for i in range(0, iterations):
 
 # print(y)
 
-misc.plot_one_line('Shuflle of the data', x_iteration, y_rmse, 'Iteration', 'RMSE')
+plots.plot_one_line('Shuflle of the data', x_iteration, y_rmse, 'Iteration', 'RMSE')
 print(sum(y_rmse) / float(len(y_rmse)))
 
 time_end = datetime.datetime.now()
