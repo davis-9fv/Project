@@ -49,7 +49,7 @@ print('Size Test %i' % (len(test)))
 print('Size supervised %i' % (size_supervised))
 print('Size raw_values %i' % (len(avg_values)))
 
-alphas = np.linspace(3, -3, 50)
+alphas = np.linspace(3, 0, 50)
 
 print(alphas)
 print("Total Alphas")

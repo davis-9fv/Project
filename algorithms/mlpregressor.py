@@ -11,10 +11,10 @@ def mlpregressor(x_train, y_train, x_val, y_val, x_test):
     print("Train VS Val")
     # For time we choose max_iter=100000
 
-    nn = neural_network.MLPRegressor(activation='tanh', solver='adam',
+    nn = neural_network.MLPRegressor(activation='relu', solver='adam',
                                      batch_size='auto',
-                                     hidden_layer_sizes=(300),
-                                     max_iter=1000000000, shuffle=False, early_stopping=True)
+                                     hidden_layer_sizes=(10,),
+                                     max_iter=1000000000, shuffle=True, early_stopping=True)
     print(nn)
     y_val_predicted_list = []
     y_train_val_predicted_list = []

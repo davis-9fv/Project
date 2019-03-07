@@ -117,7 +117,7 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
                                                                                                   x_val,
                                                                                                   y_val,
                                                                                                   x_test)
-            print_results(window_size, scaler, conf.algorithm_lstm, 'Alpha', alphas,
+            print_results(window_size, scaler, conf.algorithm_mlp, 'Alpha', alphas,
                           x_train_val, x_val, x_test,
                           y_train_val, y_val, y_test,
                           y_tr_val_hat_es_list, y_val_hat_es_list, y_te_hat_es_list)
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     use_dummy = False
     use_elasticnet = False
     use_lasso = False
-    use_knn = False
+    use_knn = True
     use_sgd = False
-    use_mlp = True
+    use_mlp = False
     main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_sgd, use_mlp)

@@ -83,7 +83,7 @@ def split_ds_train_test(supervised):
     split_train_test = int(size_supervised * config.train_rate)
     train, test = supervised[0:split_train_test], supervised[split_train_test:]
     # transform the scale of the data
-    scaler, train_scaled, test_scaled = data_misc.scale(train, test)
+    scaler, train_scaled, test_scaled = data_misc.standarize(train, test)
     x_train, y_train = train_scaled[:, 0:-1], train_scaled[:, -1]
     x_test, y_test = test_scaled[:, 0:-1], test_scaled[:, -1]
     return scaler, x_train, y_train, x_test, y_test
@@ -102,8 +102,8 @@ def split_ds_train_val_test(supervised):
     test = supervised[split_train_val + split_val_test:]
 
     # transform the scale of the data
-    scaler, train_scaled, val_scaled = data_misc.scale(train, val)
-    scaler, train_scaled, test_scaled = data_misc.scale(train, test)
+    scaler, train_scaled, test_scaled = data_misc.standarize(train, test)
+    val_scaled = scaler.transform(val)
 
     # print(val[:, -1])
     x_train, y_train = train_scaled[:, 0:-1], train_scaled[:, -1]

@@ -7,13 +7,27 @@ from pandas import unique
 import numpy
 from pandas import concat
 from numpy import mean
-from scipy.stats.stats import pearsonr
+from sklearn.preprocessing import StandardScaler
 
 
 # scale train and test data to [-1, 1]
 def scale(train, test):
     # fit scaler
     scaler = MinMaxScaler(feature_range=(0, 1))
+    scaler = scaler.fit(train)
+    # transform train
+    train = train.reshape(train.shape[0], train.shape[1])
+    train_scaled = scaler.transform(train)
+    # transform test
+    test = test.reshape(test.shape[0], test.shape[1])
+    test_scaled = scaler.transform(test)
+    return scaler, train_scaled, test_scaled
+
+
+# scale train and test data to [-1, 1]
+def standarize(train, test):
+    # fit scaler
+    scaler = StandardScaler()
     scaler = scaler.fit(train)
     # transform train
     train = train.reshape(train.shape[0], train.shape[1])
@@ -46,7 +60,7 @@ def invert_scale_array(scaler, X, values):
 
 # create a differenced series
 # Trabaja perfectamente, se come el primer valor de la data
-def difference(dataset, interval=1, include_first_item = False):
+def difference(dataset, interval=1, include_first_item=False):
     diff = list()
     if include_first_item:
         diff.append(0)
@@ -203,5 +217,5 @@ def slide_data(data, lag=2):
 def correlation(col1, col2):
     df = DataFrame({'col1': col1, 'col2': col2})
     corr_matrix = df.corr(method='pearson', min_periods=1)
-    result = corr_matrix.iloc[0,1]
+    result = corr_matrix.iloc[0, 1]
     return result
