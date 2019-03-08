@@ -21,12 +21,12 @@ def lstm(x_train, y_train, x_to_predict, batch_size, nb_epoch=3, neurons=3):
     model = Sequential()
 
     model.add(LSTM(neurons,
-                   activation='tanh',
+                   activation='relu',
                    bias_regularizer=L1L2(l1=l1, l2=l2),
                    batch_input_shape=(batch_size, x_train.shape[1], x_train.shape[2]),
                    stateful=True))
     model.add(Dense(1))
-    model.compile(loss='mean_squared_error', optimizer='sgd')
+    model.compile(loss='mean_squared_error', optimizer='adam')
     for i in range(nb_epoch):
         model.fit(x_train, y_train, epochs=1, batch_size=batch_size, verbose=0, shuffle=False)
         model.reset_states()

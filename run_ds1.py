@@ -115,8 +115,9 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
         if use_mlp:
             alphas = np.linspace(2.50, 0, 40)
             alphas = data_misc.float_presicion(alphas, 4)
-            hidden_layer_1 = [5]
-            hidden_layer_2 = hidden_layer_3 = hidden_layer_1
+            hidden_layer_1 = [5, 8, 10, 15, 20, 25, 50, 100]
+            hidden_layer_2 = [0, 5, 8, 10, 15, 20, 25, 50, 100]
+            hidden_layer_3 = [0, 5, 8, 10, 15, 20, 25, 50, 100]
             activation = ['relu']
             optimization = ['adam', 'sgd']
             for hl1 in hidden_layer_1:
