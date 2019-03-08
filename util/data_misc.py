@@ -219,3 +219,10 @@ def correlation(col1, col2):
     corr_matrix = df.corr(method='pearson', min_periods=1)
     result = corr_matrix.iloc[0, 1]
     return result
+
+
+def float_presicion(numbers: [], presicion: int):
+    result = []
+    for number in numbers:
+        result.append(round(number, presicion))
+    return result

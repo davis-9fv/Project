@@ -2,8 +2,7 @@ from sklearn import linear_model
 import numpy as np
 
 
-def lasso(x_train, y_train, x_val, y_val, x_test):
-    alphas = np.linspace(3, 0, 50)
+def lasso(x_train, y_train, x_val, y_val, x_test,alphas):
     print('Lasso')
     print(alphas)
     print("Total Alphas %i" % (len(alphas)))

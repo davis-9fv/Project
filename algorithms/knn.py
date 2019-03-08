@@ -2,8 +2,7 @@ import numpy as np
 from sklearn.neighbors import KNeighborsRegressor
 
 
-def knn(x_train, y_train, x_val, y_val, x_test):
-    n_neighbors = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 120]
+def knn(x_train, y_train, x_val, y_val, x_test, n_neighbors):
     print('KNN')
     print(n_neighbors)
     print('Total Neighbors %i' % (len(n_neighbors)))

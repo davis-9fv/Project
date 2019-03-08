@@ -2,19 +2,24 @@ from sklearn import neural_network
 import numpy as np
 
 
-def mlpregressor(x_train, y_train, x_val, y_val, x_test):
-    alphas = np.linspace(3, 0, 50)
-    print('Lasso')
+def mlpregressor(x_train, y_train, x_val, y_val, x_test, alphas, hl1, hl2, hl3, activation, optimization):
+    print('MLP')
     print(alphas)
     print("Total Alphas %i" % (len(alphas)))
 
     print("Train VS Val")
     # For time we choose max_iter=100000
 
-    nn = neural_network.MLPRegressor(activation='relu', solver='adam',
+    nn = neural_network.MLPRegressor(activation=activation, solver=optimization,
                                      batch_size='auto',
-                                     hidden_layer_sizes=(10,),
-                                     max_iter=1000000000, shuffle=True, early_stopping=True)
+                                     max_iter=1000000000, shuffle=False, early_stopping=True)
+    if hl2 == 0:
+        nn.hidden_layer_sizes = (hl1,)
+    if hl2 != 0 and hl3 == 0:
+        nn.hidden_layer_sizes = (hl1, hl2)
+    if hl2 != 0 and hl3 != 0:
+        nn.hidden_layer_sizes = (hl1, hl2, hl3)
+
     print(nn)
     y_val_predicted_list = []
     y_train_val_predicted_list = []
@@ -31,8 +36,10 @@ def mlpregressor(x_train, y_train, x_val, y_val, x_test):
     y_train_val = np.concatenate((y_train, y_val), axis=0)
 
     for a in alphas:
+        print(a)
         nn.set_params(alpha=a)
         nn.fit(x_train_val, y_train_val)
+
         y_train_val_predicted_list.append(nn.predict(x_train_val))
         # Train + Val VS Test
         y_test_predicted_list.append(nn.predict(x_test))

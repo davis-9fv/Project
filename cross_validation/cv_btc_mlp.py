@@ -22,8 +22,10 @@ class MyThread(Thread):
     window_size = 0
     hl1 = 0
     hl2 = 0
+    hl3 = 0
     optimization = ''
     activation = ''
+    alpha = 0
     coefs = []
     rmse_val = 0
     rmse_test = 0
@@ -39,6 +41,7 @@ class MyThread(Thread):
 
         print("Train VS Val")
         nn = neural_network.MLPRegressor(solver=self.optimization,
+                                         alpha=self.alpha,
                                          batch_size='auto',
                                          max_iter=1000000000,
                                          shuffle=False, early_stopping=True)
@@ -46,8 +49,11 @@ class MyThread(Thread):
         nn.activation = self.activation
         if self.hl2 == 0:
             nn.hidden_layer_sizes = (self.hl1,)
-        else:
+        if self.hl2 != 0 and self.hl3 == 0:
             nn.hidden_layer_sizes = (self.hl1, self.hl2)
+        if self.hl2 != 0 and self.hl3 != 0:
+            nn.hidden_layer_sizes = (self.hl1, self.hl2, self.hl3)
+
         y_val_predicted_list = []
         y_train_val_predicted_list = []
         y_test_predicted_list = []
@@ -95,8 +101,13 @@ class MyThread(Thread):
 
 time_start = datetime.datetime.now()
 print('Start time: %s' % str(time_start.strftime('%Y-%m-%d %H:%M:%S')))
-hidden_layer_1 = [5, 10, 50, 100, 150, 200, 250]
-hidden_layer_2 = [0, 5, 10, 50, 100, 150, 200]
+hidden_layer_1 = [5, 8, 10, 15, 20, 25, 50, 100]
+hidden_layer_2 = [0, 5, 8, 10, 15, 20, 25, 50, 100]
+hidden_layer_3 = [0, 5, 8, 10, 15, 20, 25, 50, 100]
+alphas = np.linspace(3, 0, 2)
+
+seed = 5
+np.random.seed(seed)
 # hidden_layer_2 = [1]
 optimization = ['sgd', 'adam']
 # optimization = ['sgd']
@@ -105,15 +116,17 @@ activation = ['relu', 'tanh']
 
 combinations = [hidden_layer_1,
                 hidden_layer_2,
+                hidden_layer_3,
                 optimization,
-                activation]
+                activation,
+                alphas]
 # combinations = [window_size,lag]
 combinations = list(itertools.product(*combinations))
 print(combinations)
 print(len(combinations))
 
-windows_sizes = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-#windows_sizes = [4, 5]
+windows_sizes = [4, 5, 6, 7, 8, 9, 10, 11, 12]
+# windows_sizes = [4, 5, 6, 7, 8]
 
 for window_size in windows_sizes:
 
@@ -131,8 +144,8 @@ for window_size in windows_sizes:
     avg = series['Avg']
     avg_values = avg.values
     # Stationary Data
-    # diff_values = data_misc.difference(avg_values, 1)
-    # avg_values = diff_values
+    diff_values = data_misc.difference(avg_values, 1)
+    avg_values = diff_values
 
     print("Diff values")
 
@@ -151,8 +164,7 @@ for window_size in windows_sizes:
 
     scaler = StandardScaler()
     scaler = scaler.fit(train)
-    # scaler = StandardScaler()
-    # scaler.fit(train)
+
     train = scaler.transform(train)
     val = scaler.transform(val)
     test = scaler.transform(test)
@@ -170,12 +182,6 @@ for window_size in windows_sizes:
     print('Size supervised %i' % (size_supervised))
     print('Size raw_values %i' % (len(avg_values)))
 
-    # alphas = np.linspace(12, 0, 50)
-    alphas = np.linspace(10, 0, 100)
-    print(alphas)
-    # print("Total Alphas")
-    # print(len(alphas))
-
     """"
     """
     thread_list = []
@@ -191,15 +197,17 @@ for window_size in windows_sizes:
         combination = combinations[y]
         mythread.hl1 = combination[0]
         mythread.hl2 = combination[1]
-        mythread.optimization = combination[2]
-        mythread.activation = combination[3]
+        mythread.hl3 = combination[2]
+        mythread.optimization = combination[3]
+        mythread.activation = combination[4]
+        mythread.alpha = combination[5]
         mythread.window_size = window_size
 
         thread_list.append(mythread)
         # mythread.isAlive()
     # mythread.start()  # ...Start the thread
 
-    num_threads_running = 50
+    num_threads_running = 6
     num_buckets = int(len(thread_list) / num_threads_running) + 1
     print("NUmber of buckets %i" % (num_buckets))
 
@@ -227,6 +235,8 @@ for window_size in windows_sizes:
                 print("---------Sleep Ends")
 
         print("---------Finishing Bucket %i" % (bucket))
+
+    sleep(120)
 
 time_end = datetime.datetime.now()
 print('End time: %s' % str(time_end.strftime('%Y-%m-%d %H:%M:%S')))

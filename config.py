@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 path_windows = 'C:/tmp/bitcoin/'
-path_linux1 = '/code/Project/data/'
+path_linux1 = '/home/fran_vinueza/Project/data/'
 path_linux2 = '/home/francisco/Project/data/'
 selected_path = path_windows
 input_file_ds = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'

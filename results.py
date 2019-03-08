@@ -58,7 +58,7 @@ def results_overall(window_size, scaler, iterations, x_train, x_val, x_test, y_t
 def restults_ds1_df(algorithm, window_size, parameter_name, parameter_list,
                     rmse,
                     accu, ratio_up_li, ratio_down_li,
-                    correlation):
+                    correlation, observation):
     df = pd.DataFrame({'Window Size': window_size,
                        parameter_name: parameter_list,
                        'RMSE Train + Val': rmse.train_val,
@@ -71,7 +71,8 @@ def restults_ds1_df(algorithm, window_size, parameter_name, parameter_list,
                        '% negative': ratio_down_li,
                        'Corr Train + Val': correlation.train_val,
                        'Corr Val': correlation.val,
-                       'Corr Test': correlation.test})
+                       'Corr Test': correlation.test,
+                       'Observation': observation})
     write_file(algorithm, df, conf.output_file_ds1)
 
 

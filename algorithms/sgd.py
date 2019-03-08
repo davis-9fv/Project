@@ -2,8 +2,7 @@ from sklearn import linear_model
 import numpy as np
 
 
-def sgd(x_train, y_train, x_val, y_val, x_test):
-    alphas = np.linspace(5, 0, 50)
+def sgd(x_train, y_train, x_val, y_val, x_test, alphas):
     print('SGD')
     print(alphas)
     print("Total Alphas %i" % (len(alphas)))
@@ -17,7 +16,7 @@ def sgd(x_train, y_train, x_val, y_val, x_test):
 
     for a in alphas:
         sgd.set_params(alpha=a)
-        #print(a)
+        # print(a)
         sgd.fit(x_train, y_train)
         y_val_predicted_list.append(sgd.predict(x_val))
 
