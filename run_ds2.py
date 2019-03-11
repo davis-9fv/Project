@@ -56,10 +56,10 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
 
     # avg_window_sizes = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     # btc_window_sizes = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-    # avg_window_sizes = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    # btc_window_sizes = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    avg_window_sizes = [3]
-    btc_window_sizes = [3]
+    avg_window_sizes = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    btc_window_sizes = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    # avg_window_sizes = [3]
+    # btc_window_sizes = [3]
 
     # windows_sizes = [6]
 

@@ -75,7 +75,6 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
         if use_elasticnet:
             alphas = np.linspace(2.50, 0, 40)
             alphas = data_misc.float_presicion(alphas, 4)
-            alphas = data_misc.float_presicion(alphas, 4)
             y_val_hat_es_list, y_tr_val_hat_es_list, y_te_hat_es_list = elasticnet.elasticnet(x_train, y_train, x_val,
                                                                                               y_val, x_test, alphas)
             print_results(window_size, scaler, conf.algorithm_elasticnet, 'Alpha', alphas,
@@ -85,7 +84,6 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
 
         if use_lasso:
             alphas = np.linspace(2.50, 0, 40)
-            alphas = data_misc.float_presicion(alphas, 4)
             alphas = data_misc.float_presicion(alphas, 4)
             y_val_hat_es_list, y_tr_val_hat_es_list, y_te_hat_es_list = lasso.lasso(x_train, y_train, x_val,
                                                                                     y_val, x_test, alphas)
