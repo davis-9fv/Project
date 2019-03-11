@@ -8,7 +8,7 @@ import config
 
 path = config.selected_path
 input_file = config.input_file_ds
-dfx = pd.read_csv(path + input_file, header=0, sep=',')
+dfx = pd.read_csv(path + input_file, header=0, sep=',', nrows=1438)
 
 df = pd.DataFrame()
 df['transaction_count'] = dfx['transaction_count']
@@ -23,8 +23,8 @@ df['feeTotalUsd'] = dfx['fee_total_usd']
 df['generation'] = dfx['generation']
 df['reward'] = dfx['reward']
 df['size'] = dfx['size']
-df['weight'] = dfx['weight']
-df['stripped_size'] = dfx['stripped_size']
+#df['weight'] = dfx['weight']
+#df['stripped_size'] = dfx['stripped_size']
 
 df['Open'] = dfx['Open']
 df['High'] = dfx['High']
@@ -33,6 +33,7 @@ df['Close'] = dfx['Close']
 
 df['Avg'] = dfx['Avg']
 df['Market_Cap'] = dfx['Market_Cap']
+df['Volume'] = dfx['Volume']
 
 df['Trend'] = dfx['Trend']
 

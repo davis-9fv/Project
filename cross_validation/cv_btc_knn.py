@@ -11,6 +11,10 @@ path = 'C:/tmp/bitcoin/'
 input_file = 'bitcoin_usd_bitcoin_block_chain_trend_by_day.csv'
 series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
 series = series.iloc[::-1]
+volume = series['Volume'].values
+
+print(series['Volume'].head(10))
+
 
 for i in range(0, 30):
     corr = series['Avg'].autocorr(lag=i)
@@ -20,6 +24,7 @@ avg = series['Avg']
 avg_values = avg.values
 # Stationary Data
 diff_values = data_misc.difference(avg_values, 1)
+print(diff_values)
 avg_values = diff_values
 print("Diff values")
 

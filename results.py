@@ -80,7 +80,7 @@ def restults_ds2_df(algorithm, avg_window_size, btc_window_size, parameter_name,
                     rmse,
                     accu, ratio_up_li, ratio_down_li,
                     correlation,
-                    columns):
+                    columns, observation):
     df = pd.DataFrame({'Avg Window Size': avg_window_size,
                        'BTC Window Size': btc_window_size,
                        parameter_name: parameter_list,
@@ -95,7 +95,8 @@ def restults_ds2_df(algorithm, avg_window_size, btc_window_size, parameter_name,
                        'Corr Train + Val': correlation.train_val,
                        'Corr Val': correlation.val,
                        'Corr Test': correlation.test,
-                       'Columns': columns})
+                       'Columns': columns,
+                       'Observation': observation})
     write_file(algorithm, df, conf.output_file_ds2)
 
 

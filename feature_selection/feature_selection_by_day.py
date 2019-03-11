@@ -4,8 +4,6 @@
 # Variance Threshold
 # Wrapper Methods: Forward Search, Recursive Feature Elimination
 # https://towardsdatascience.com/why-how-and-when-to-apply-feature-selection-e9c69adfabf2
-from plistlib import Data
-
 from pandas import read_csv
 from pandas import DataFrame
 from sklearn.feature_selection import f_regression
@@ -18,7 +16,9 @@ path = config.selected_path
 input_file = config.input_file_ds
 output_file = 'feature_selection.csv'
 
-series = read_csv(path + input_file, header=0, sep=',')
+series = read_csv(path + input_file, header=0, sep=',', nrows=1438)
+
+
 
 x_series = DataFrame({
     'Open': series['Open'],
@@ -26,7 +26,7 @@ x_series = DataFrame({
     'Low': series['Low'],
     'Close': series['Close'],
     # The records of the volume column are incomplete
-    # 'Volume': series['Volume'],
+    'Volume': series['Volume'],
     'Market_Cap': series['Market_Cap'],
     'day_of_week': series['day_of_week'],
     'day_of_month': series['day_of_month'],
@@ -48,8 +48,8 @@ x_series = DataFrame({
     'reward': series['reward'],
 
     'size': series['size'],
-    'weight': series['weight'],
-    'stripped_size': series['stripped_size'],
+    # 'weight': series['weight'],
+    # 'stripped_size': series['stripped_size'],
     'Trend': series['Trend']
 }
     , dtype='int64')

@@ -94,8 +94,9 @@ def plot_one_line(title="Unkown", x=[], y=[], x_title='x', y_title='y', legend='
 
 
 def create_figure(label='label', width=800, height=150, date=[], column=[], legend='legend', color='blue'):
-    p = figure(width=width, plot_height=height)
-    p.line(pd.to_datetime(date), column, legend=legend, color=color)
+    p = figure(width=width, plot_height=height, x_axis_type="datetime")
+    p.grid.grid_line_alpha = 0.2
+    p.line(pd.to_datetime(date), column, legend=legend, color=color,line_width=2)
     p.yaxis.axis_label = label
     p.legend.location = "top_left"
     return p

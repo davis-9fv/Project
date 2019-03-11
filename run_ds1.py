@@ -75,6 +75,7 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
         if use_elasticnet:
             alphas = np.linspace(2.50, 0, 40)
             alphas = data_misc.float_presicion(alphas, 4)
+            alphas = data_misc.float_presicion(alphas, 4)
             y_val_hat_es_list, y_tr_val_hat_es_list, y_te_hat_es_list = elasticnet.elasticnet(x_train, y_train, x_val,
                                                                                               y_val, x_test, alphas)
             print_results(window_size, scaler, conf.algorithm_elasticnet, 'Alpha', alphas,
@@ -84,6 +85,7 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
 
         if use_lasso:
             alphas = np.linspace(2.50, 0, 40)
+            alphas = data_misc.float_presicion(alphas, 4)
             alphas = data_misc.float_presicion(alphas, 4)
             y_val_hat_es_list, y_tr_val_hat_es_list, y_te_hat_es_list = lasso.lasso(x_train, y_train, x_val,
                                                                                     y_val, x_test, alphas)
@@ -119,7 +121,7 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
             hidden_layer_2 = [0, 5, 8, 10, 15, 20, 25, 50, 100]
             hidden_layer_3 = [0, 5, 8, 10, 15, 20, 25, 50, 100]
             activation = ['relu']
-            optimization = ['adam', 'sgd']
+            optimization = ['adam']
             for hl1 in hidden_layer_1:
                 for hl2 in hidden_layer_2:
                     for hl3 in hidden_layer_3:

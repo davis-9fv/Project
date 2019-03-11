@@ -1,5 +1,4 @@
 import datetime
-from util import algorithms
 from pandas import DataFrame
 from pandas import read_csv
 from sklearn.metrics import mean_squared_error
@@ -77,7 +76,7 @@ plot = False
 
 # window_size_opt = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
 window_size_opt = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14]
-#window_size_opt = [5]
+window_size_opt = [3]
 
 lag = 1
 
@@ -163,6 +162,7 @@ for combination in combinations:
     # Stationary Data
     # Difference only works for one step. Please implement for other steps
     avg_diff_values = data_misc.difference(avg_values, lag)
+    print(avg_diff_values)
     # Avg values converted into supervised model
     avg_supervised = data_misc.timeseries_to_supervised(avg_diff_values, window_size)
     # The first [Window size number] contains zeros which need to be cut.
@@ -176,6 +176,7 @@ for combination in combinations:
     train, test = supervised[0:split], supervised[split:]
     # transform the scale of the data
     scaler, train_scaled, test_scaled = data_misc.scale(train, test)
+    print(train_scaled[0:10,:])
     x_train, y_train = train_scaled[:, 0:-1], train_scaled[:, -1]
     x_test, y_test = test_scaled[:, 0:-1], test_scaled[:, -1]
 
