@@ -65,10 +65,10 @@ def difference(dataset, interval=1, include_first_item=False):
     if include_first_item:
         diff.append(0)
     for i in range(interval, len(dataset)):
-        num1 = dataset[i]
-        num2 = dataset[i - interval]
+        value = dataset[i] / dataset[i - interval]
+        #value = dataset[i] - dataset[i - interval]
 
-        value = dataset[i] - dataset[i - interval]
+
         diff.append(value)
     return Series(diff)
 
@@ -77,7 +77,9 @@ def difference(dataset, interval=1, include_first_item=False):
 # Trabaja perfectamente, elimina el primer valor de la data
 def inverse_difference(history, yhat, interval=1):
     value = history[-interval]
-    result = yhat + value
+
+    result = yhat * value
+    #result = yhat + value
     return result
 
 

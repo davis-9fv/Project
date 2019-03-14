@@ -5,6 +5,7 @@ from sklearn.neighbors import KNeighborsRegressor
 from math import sqrt
 from sklearn.metrics import mean_squared_error
 from graphs import plots
+from sklearn.preprocessing import StandardScaler
 
 window_size = 5  # 15
 path = 'C:/tmp/bitcoin/'
@@ -14,7 +15,6 @@ series = series.iloc[::-1]
 volume = series['Volume'].values
 
 print(series['Volume'].head(10))
-
 
 for i in range(0, 30):
     corr = series['Avg'].autocorr(lag=i)
@@ -40,6 +40,14 @@ split_val_test = int(size_supervised * 0.20)
 train = supervised[0:split_train_val]
 val = supervised[split_train_val:split_train_val + split_val_test]
 test = supervised[split_train_val + split_val_test:]
+
+
+scaler = StandardScaler()
+scaler = scaler.fit(train)
+
+train = scaler.transform(train)
+val = scaler.transform(val)
+test = scaler.transform(test)
 
 x_train, y_train = train[:, 0:-1], train[:, -1]
 x_val, y_val = val[:, 0:-1], val[:, -1]
@@ -87,7 +95,6 @@ for a in n_neighbors:
     rmse = sqrt(mean_squared_error(y_test, y_test_predicted))
     rmse_test.append(rmse)
     print('RMSE KNN   %.3f    N. Neighbours:  %i' % (rmse, a))
-
 
 print("Index Best Neighbor - Val")
 index = np.array(rmse_val)
