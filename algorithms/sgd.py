@@ -9,7 +9,11 @@ def sgd(x_train, y_train, x_val, y_val, x_test, alphas):
 
     print("Train VS Val")
     # For time we choose max_iter=8000
-    sgd = linear_model.SGDRegressor(max_iter=8000, verbose=False, shuffle=False)
+    sgd = linear_model.SGDRegressor(max_iter=110000, verbose=False,
+                                    penalty='l2',
+                                    early_stopping=True, tol=1e-5,
+                                    shuffle=True)
+
     y_val_predicted_list = []
     y_train_val_predicted_list = []
     y_test_predicted_list = []

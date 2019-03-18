@@ -12,7 +12,7 @@ def mlpregressor(x_train, y_train, x_val, y_val, x_test, alphas, hl1, hl2, hl3, 
 
     nn = neural_network.MLPRegressor(activation=activation, solver=optimization,
                                      batch_size='auto',
-                                     max_iter=1000000000, shuffle=False, early_stopping=True)
+                                     max_iter=1000000000, shuffle=True, early_stopping=True)
     if hl2 == 0:
         nn.hidden_layer_sizes = (hl1,)
     if hl2 != 0 and hl3 == 0:

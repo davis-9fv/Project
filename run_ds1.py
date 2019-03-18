@@ -43,8 +43,8 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
 
     # results.results_accuracy([100, 110, 120, 90], [101, 105, 130, 95])
 
-    windows_sizes = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    # windows_sizes = [4]
+    #windows_sizes = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    windows_sizes = [4]
 
     for window_size in windows_sizes:
         print('\n')
@@ -115,9 +115,9 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
         if use_mlp:
             alphas = np.linspace(2.50, 0, 40)
             alphas = data_misc.float_presicion(alphas, 4)
-            hidden_layer_1 = [5, 8, 10, 15, 20, 25, 50, 100]
-            hidden_layer_2 = [0, 5, 8, 10, 15, 20, 25, 50, 100]
-            hidden_layer_3 = [0, 5, 8, 10, 15, 20, 25, 50, 100]
+            hidden_layer_1 = [10]
+            hidden_layer_2 = [50]
+            hidden_layer_3 = [50]
             activation = ['relu']
             optimization = ['adam']
             for hl1 in hidden_layer_1:
