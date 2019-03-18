@@ -222,5 +222,5 @@ if __name__ == '__main__':
     use_lasso = False
     use_knn = False
     use_sgd = False
-    use_mlp = False
+    use_mlp = True
     main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_sgd, use_mlp)
