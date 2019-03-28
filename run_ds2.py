@@ -177,12 +177,12 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
                                   btc_col_li)
 
                 if use_mlp:
-                    alphas = np.linspace(2.10, 0, 30)
+                    alphas = np.linspace(2.10, 0, 25)
                     alphas = data_misc.float_presicion(alphas, 4)
                     btc_col_li = fill_col_list(btc_col, len(alphas))
-                    hidden_layer_1 = [5, 8, 10, 15, 20, 25, 50]
-                    hidden_layer_2 = [0, 5, 8, 10, 15, 20, 25, 50]
-                    hidden_layer_3 = [0, 5, 8, 10, 15, 20, 25, 50]
+                    hidden_layer_1 = [5, 8, 10, 15, 20, 25]
+                    hidden_layer_2 = [0, 5, 8, 10, 15, 20, 25]
+                    hidden_layer_3 = [0, 5, 8, 10, 15, 20, 25]
 
                     activation = ['relu']
                     optimization = ['adam']

@@ -34,6 +34,8 @@ def create_avg_supervised_ds(window_size, series, cut_window_size):
     # Stationary Data
     # Difference only works for one step. Please implement for other steps
     avg_diff_values = data_misc.difference(avg_values, lag)
+    print(avg_diff_values.min())
+    print(avg_diff_values.max())
     # Avg values converted into supervised model
     avg_supervised = data_misc.timeseries_to_supervised(avg_diff_values, window_size)
     # The first [Window size number] contains zeros which need to be cut.
