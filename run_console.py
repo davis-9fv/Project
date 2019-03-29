@@ -32,13 +32,13 @@ if __name__ == '__main__':
     parser.add_argument('--winsizes',
                         type=int,
                         nargs="+",
-                        default=[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                        default=[3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                         help='Choose Window Size')
 
     parser.add_argument('--btcsizes',
                         type=int,
                         nargs="+",
-                        default=[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                        default=[3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                         help='Choose BTC Size')
 
     FLAGS = parser.parse_args()

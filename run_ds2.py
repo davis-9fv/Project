@@ -108,7 +108,7 @@ def main(avg_window_sizes, btc_window_sizes,
                                   y_tr_val_hat_es_list, y_val_hat_es_list, y_te_hat_es_list,
                                   btc_col_li)
                 if use_elasticnet:
-                    alphas = np.linspace(2.50, 0, 40)
+                    alphas = np.linspace(2, 0, 25)
                     alphas = data_misc.float_presicion(alphas, 4)
                     y_val_hat_es_list, y_tr_val_hat_es_list, y_te_hat_es_list = elasticnet.elasticnet(x_train, y_train,
                                                                                                       x_val,
@@ -124,7 +124,7 @@ def main(avg_window_sizes, btc_window_sizes,
                                   btc_col_li)
 
                 if use_lasso:
-                    alphas = np.linspace(2.50, 0, 40)
+                    alphas = np.linspace(2, 0, 25)
                     alphas = data_misc.float_presicion(alphas, 4)
                     y_val_hat_es_list, y_tr_val_hat_es_list, y_te_hat_es_list = lasso.lasso(x_train, y_train, x_val,
                                                                                             y_val,
@@ -154,7 +154,7 @@ def main(avg_window_sizes, btc_window_sizes,
                                   btc_col_li)
 
                 if use_sgd:
-                    alphas = np.linspace(2.50, 0, 40)
+                    alphas = np.linspace(2, 0, 25)
                     alphas = data_misc.float_presicion(alphas, 4)
                     y_val_hat_es_list, y_tr_val_hat_es_list, y_te_hat_es_list = sgd.sgd(x_train, y_train, x_val,
                                                                                         y_val,
