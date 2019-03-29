@@ -49,19 +49,12 @@ def print_results(window_size, avg_window_size, btc_window_size,
                             columns, observation)
 
 
-def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_sgd, use_mlp):
+def main(avg_window_sizes, btc_window_sizes,
+         use_no_prediction, use_dummy, use_elasticnet,
+         use_lasso, use_knn, use_sgd, use_mlp):
     conf.print_conf()
     time_start = datetime.datetime.now()
     print('Start time: %s' % str(time_start.strftime('%Y-%m-%d %H:%M:%S')))
-
-    # avg_window_sizes = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-    # btc_window_sizes = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-    avg_window_sizes = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    btc_window_sizes = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    # avg_window_sizes = [3]
-    # btc_window_sizes = [3]
-
-    # windows_sizes = [6]
 
     for avg_window_size in avg_window_sizes:
         for btc_window_size in btc_window_sizes:
@@ -177,12 +170,12 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
                                   btc_col_li)
 
                 if use_mlp:
-                    alphas = np.linspace(2.10, 0, 25)
+                    alphas = np.linspace(2, 0, 25)
                     alphas = data_misc.float_presicion(alphas, 4)
                     btc_col_li = fill_col_list(btc_col, len(alphas))
-                    hidden_layer_1 = [5, 8, 10, 15, 20, 25]
-                    hidden_layer_2 = [0, 5, 8, 10, 15, 20, 25]
-                    hidden_layer_3 = [0, 5, 8, 10, 15, 20, 25]
+                    hidden_layer_1 = [5, 8, 10, 15, 20, 25, 50, 100]
+                    hidden_layer_2 = [0, 5, 8, 10, 15, 20, 25, 50, 100]
+                    hidden_layer_3 = [0, 5, 8, 10, 15, 20, 25, 50, 100]
 
                     activation = ['relu']
                     optimization = ['adam']
@@ -216,11 +209,17 @@ def main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_s
 
 
 if __name__ == '__main__':
+    # avg_window_sizes = [3]
+    avg_window_sizes = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    btc_window_sizes = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
     use_no_prediction = False
     use_dummy = False
     use_elasticnet = False
     use_lasso = False
     use_knn = False
     use_sgd = False
-    use_mlp = True
-    main(use_no_prediction, use_dummy, use_elasticnet, use_lasso, use_knn, use_sgd, use_mlp)
+    use_mlp = False
+    main(avg_window_sizes, btc_window_sizes,
+         use_no_prediction, use_dummy, use_elasticnet,
+         use_lasso, use_knn, use_sgd, use_mlp)
