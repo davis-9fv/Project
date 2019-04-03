@@ -11,6 +11,7 @@ path = conf.selected_path
 input_file_ds = conf.output_file_ds1
 
 algorithms = ['elasticnet', 'lasso', 'knn', 'sgd', 'mlp', 'dummy']
+algorithms = ['elasticnet',  'knn',  'mlp', 'dummy']
 
 target_column = 'RMSE_Val'
 # target_column = 'Accu Val'

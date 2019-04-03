@@ -20,6 +20,8 @@ path = conf.selected_path
 input_file_ds = conf.output_file_ds1
 
 algorithms = ['elasticnet', 'lasso', 'knn', 'sgd', 'mlp']
+algorithms = ['elasticnet', 'lasso', 'knn', 'sgd', 'mlp']
+
 # algorithms = ['knn']
 
 filter_column = 'RMSE_Val'
@@ -39,13 +41,15 @@ if use_rmse:
 
     y_range = rmse_range
     y_column_val = 'RMSE_Val'
-    y_column_test = 'RMSE Test'
+    #y_column_test = 'RMSE Test'
+    y_column_test = 'RMSE Train + Val'
 else:
     y_label = 'Accuracy'
     accu_range = (0, 1)
     y_range = accu_range
     y_column_val = 'Accu Val'
     y_column_test = 'Accu Test'
+    y_column_test = 'Accu Train + Val'
 
 columns = []
 input_file = ""
@@ -91,10 +95,14 @@ for algorithm in algorithms:
     p1.line(algorithm_df['Window Size'].values, algorithm_df[y_column_val].values,
             color=colors[i], legend='Val ' + algorithm,
             line_width=1.5)
+    p1.circle(algorithm_df['Window Size'].values, algorithm_df[y_column_val].values,
+              color=colors[i], size=3)
 
     p1.line(algorithm_df['Window Size'].values, algorithm_df[y_column_test].values,
-            color=colors[i], legend='Test ' + algorithm,
+            color=colors[i], legend='Train ' + algorithm,
             line_dash='12 7', line_width=1.5)
+    p1.circle(algorithm_df['Window Size'].values, algorithm_df[y_column_test].values,
+              color=colors[i], size=3)
 
     p1.legend.label_text_font_size = '9.5pt'
     p1.legend.location = "top_right"

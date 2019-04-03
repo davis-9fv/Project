@@ -16,7 +16,7 @@ input_file = config.input_file_ds
 dfx = pd.read_csv(path + input_file, header=0, sep=',')
 print(dfx.shape)
 # max_lag = dfx.shape[0]
-max_lag = 700
+max_lag = 400
 lags = [x for x in range(0, max_lag)]
 correlations = [0 for x in range(0, max_lag)]
 

@@ -21,7 +21,9 @@ path = conf.selected_path
 input_file_ds = conf.output_file_ds1
 
 algorithms = ['elasticnet', 'lasso', 'knn', 'sgd', 'mlp']
-#algorithms = ['mlp']
+algorithms = ['elasticnet', 'lasso', 'knn', 'mlp']
+
+# algorithms = ['mlp']
 
 target_column = 'RMSE_Val'
 # target_column = 'Accu Val'
@@ -62,8 +64,7 @@ for algorithm in algorithms:
     columns = df.columns.values
     TOOLS = "hover,save,pan,box_zoom,reset,wheel_zoom"
 
-    p1 = figure(y_range=(220, 500), tools=TOOLS,
-                )
+    p1 = figure(y_range=(60, 410), tools=TOOLS)
 
     p1.grid.grid_line_alpha = 0.2
     p1.xaxis.axis_label = x_column
@@ -73,10 +74,11 @@ for algorithm in algorithms:
     p1.extra_y_ranges = {"foo": Range1d(start=0, end=1)}
     p1.add_layout(LinearAxis(y_range_name="foo"), 'right')
 
-    colors = ['', '', '', 'skyblue', 'blue', 'black','gray', 'green',  'yellow', 'pink', 'orange', 'maroon', 'red']
+    colors = ['', '', '', 'skyblue', 'blue', 'black', 'gray', 'green', 'yellow', 'pink', 'orange', 'maroon', 'red']
 
     i = 0
-    for win_size in range(8, 13):
+    for win_size in range(3, 13, 3):
+
         algorithm_df = None
         color = colors[win_size]
         if algorithm != conf.algorithm_mlp:
@@ -91,19 +93,27 @@ for algorithm in algorithms:
 
         algorithm_df = algorithm_df.sort_values(by=[x_column], ascending=True)
         print(algorithm_df[x_column].values)
+        print(':::::')
 
         # p1.y_range = (200,500)
         p1.line(algorithm_df[x_column].values, algorithm_df['RMSE_Val'].values,
                 color=color, legend='Val ' + algorithm + ' WinSize:' + str(win_size),
                 line_width=1.5)
-        p1.line(algorithm_df[x_column].values, algorithm_df['RMSE Test'].values,
-                color=color, legend='Test ' + algorithm + ' WinSize:' + str(win_size),
+        p1.circle(algorithm_df[x_column].values, algorithm_df['RMSE_Val'].values,
+                  color=color, size=3)
+        p1.line(algorithm_df[x_column].values, algorithm_df['RMSE Train + Val'].values,
+                color=color, legend='Train ' + algorithm + ' WinSize:' + str(win_size),
                 line_dash='12 7', line_width=1.5)
+        p1.circle(algorithm_df[x_column].values, algorithm_df['RMSE Train + Val'].values,
+                  color=color, size=3)
+
 
         p1.line(algorithm_df[x_column].values, algorithm_df['Accu Val'].values,
                 color=color, legend='Val Accu ' + algorithm + ' WinSize:' + str(win_size),
                 line_dash='2 5', line_width=2,
                 y_range_name="foo")
+        p1.circle(algorithm_df[x_column].values, algorithm_df['Accu Val'].values,
+                  color=color, size=3)
 
         i = i + 1
         p1.legend.label_text_font_size = '9.5pt'
